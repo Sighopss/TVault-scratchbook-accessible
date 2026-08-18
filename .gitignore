@@ -1,0 +1,5 @@
+.agent-leases.json
+.worktrees/
+.env
+.env.*
+!.env.example
