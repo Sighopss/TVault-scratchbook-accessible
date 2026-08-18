@@ -15,30 +15,56 @@ metadata:
 
 # Trevor lane — Recorder + AWS
 
-Read repo-root `PLAN.md` first. If it is missing, stop.
+You are a coding agent on **Trevor’s lane** of TraceVault (AI Application Flight Recorder).
 
-This folder is the **only** Trevor skill. Sibling files are progressive disclosure — open them when the table says so. Do not load the entire folder into one prompt unless the human asked for a full brief.
+Read repo-root `PLAN.md` and this file before any edit. Then open **exactly one** mission file under `agents/` that matches your assigned id. Execute that mission. Do not wander into another mission.
 
-Many agents may run on one computer. Alexis owns persistence. Michael owns the UI. Trevor emits schema-valid flights onto AWS and does not leak raw prompts in logs.
+If `PLAN.md` is missing, stop.
 
-## Always on
+## Product (do not invent another)
 
-- Write only: `sdk/`, `demo-app/`, `infra/`, `scripts/`, `.github/`, `Makefile`
-- Read-only after hour 0: `contracts/`
-- Never write: `vault/`, `web/`, `PRODUCT.md`, `DESIGN.md`
-- Never: Grafana/Streamlit as UI, Langfuse as backend, EKS/AKS, OpenSearch, stock OTLP of raw prompts, AKIA in git, force-push `main`, commit unless asked, start long-running servers
+One request = one **flight** = one `trace_id` with child spans (`llm`, `tool`, `rag`, `http`). Trevor **creates** those spans from a tiny Bedrock RAG/agent and ships them to AWS. Alexis **stores** only redacted payloads. Michael **renders** them in Next.js. Grafana is not the product. Langfuse is not the backend.
 
-Hour 0 (whole team): `contracts/span.schema.json` + fixtures. **No Trevor lane code until those exist.**
+Judge trigger Trevor owes: `scripts/demo_pii_flight.sh` runs a demo whose user prompt contains an email and a fake SSN. Trevor still emits schema-valid JSON with `tenant_id`, tokens, `cost_usd`. Alexis redacts at ingest. Michael shows `REDACTED`.
 
-## Open next
+## Hard fences (non-negotiable)
 
-| If the task is… | Read |
-|---|---|
-| Unsure who owns a path | [ownership.md](ownership.md) |
-| Parallel agents / worktrees / leases | [parallel.md](parallel.md) |
-| SDK, demo, Terraform, pins | [stack.md](stack.md) |
-| Secrets, tenants, IAM, CI | [enterprise.md](enterprise.md) |
-| Talking to Alexis or Michael | [handoffs.md](handoffs.md) |
-| Execution order and done-list | [workflow.md](workflow.md) |
+**Write:** `sdk/`, `demo-app/`, `infra/`, `scripts/`, `.github/`, `Makefile`
 
-Canonical path: `skills/trevor-recorder/`. Tool stubs under `.cursor/`, `.claude/`, `.kiro/` must not drift — they only point here.
+**Read-only after hour 0:** `contracts/` (schema + fixtures). Hour 0 is the three humans. Until `contracts/span.schema.json` exists, implement against `skills/trevor-recorder/span.schema.draft.json` and copy it into `contracts/` only if the human said hour 0 is done.
+
+**Never write:** `vault/` (Alexis), `web/` (Michael), `PRODUCT.md`, `DESIGN.md`, `assets/`
+
+**Never:** Streamlit/Grafana UI, Langfuse/Phoenix store, EKS/AKS, OpenSearch, stock OTLP export of raw prompts, commit AWS keys, force-push `main`, commit unless the human asked, start long-running servers, log raw prompts.
+
+If you need a vault or web change: write `handoffs/FROM-trevor.md` using the template in [handoffs.md](handoffs.md) and stop.
+
+## Parallel (one computer, many agents)
+
+Claim a lease in `.agent-leases.json` (gitignored) before writing. One id, one path set. Details: [parallel.md](parallel.md).
+
+| Your id | Mission file | Paths |
+|---|---|---|
+| `trevor-sdk` | [agents/sdk.md](agents/sdk.md) | `sdk/` |
+| `trevor-demo` | [agents/demo.md](agents/demo.md) | `demo-app/` |
+| `trevor-scripts` | [agents/scripts.md](agents/scripts.md) | `scripts/` |
+| `trevor-infra` | [agents/infra.md](agents/infra.md) | `infra/` |
+| `trevor-ci` | [agents/ci.md](agents/ci.md) | `.github/`, `Makefile` |
+
+Human Trevor may hold infra+ci together. Subagents must not.
+
+Worktree: `.worktrees/<id>/` on branch `trevor/<id>/<slug>`. Do not nest worktrees. Do not share a dirty tree.
+
+## Stack (locked)
+
+Python 3.12 + `uv`. Terraform >= 1.9. GitHub Actions. Bedrock Claude or Nova, `us-east-1`. GNU coreutils, no PowerShell, prefer WSL2.
+
+Span JSON fields (must match schema): `trace_id`, `span_id`, `parent_id`, `tenant_id`, `kind`, `name`, `status`, `start_time`, `end_time`, `gen_ai.request.model`, `gen_ai.usage.input_tokens`, `gen_ai.usage.output_tokens`, `cost_usd`, `attributes`, `events`.
+
+Env: `TRACEVAULT_INGEST_URL`, `TRACEVAULT_TENANT_KEY`, `AWS_REGION`, `BEDROCK_MODEL_ID`. Never hardcode URLs or keys.
+
+Full pin list: [stack.md](stack.md). Security bar: [enterprise.md](enterprise.md). Team I/O: [handoffs.md](handoffs.md). Steps: [workflow.md](workflow.md).
+
+## After the mission
+
+Release the lease. Leave a 10-line handoff: what files, what env vars, what is blocked on Alexis/Michael. Do not start the next mission unless the human named it.

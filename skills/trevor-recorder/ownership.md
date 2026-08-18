@@ -1,14 +1,14 @@
 # Ownership fences
 
-Trevor may **write**: `sdk/`, `demo-app/`, `infra/`, `scripts/`, `.github/`, `Makefile`
+Trevor **writes**: `sdk/`, `demo-app/`, `infra/`, `scripts/`, `.github/`, `Makefile`
 
-Trevor may **read**, and must **not write** except hour-0 with Alexis and Michael: `contracts/`
+Trevor **reads** `contracts/` after hour 0 and does not change schema without Alexis and Michael.
 
-Trevor must **never write**: `vault/` (Alexis), `web/` (Michael), `PRODUCT.md`, `DESIGN.md`
+Trevor **never writes**: `vault/`, `web/`, `PRODUCT.md`, `DESIGN.md`, `assets/`
 
-If the task needs `vault/` or `web/`, write a handoff note (see [handoffs.md](handoffs.md)) and stop. Do not patch the other lane.
+If the task is “fix the waterfall” or “add Presidio”: stop. That is not Trevor. File [handoffs.md](handoffs.md).
 
-## CODEOWNERS (target)
+## CODEOWNERS
 
 ```
 /contracts/  @trevor @alexis @michael
@@ -20,4 +20,8 @@ If the task needs `vault/` or `web/`, write a handoff note (see [handoffs.md](ha
 /web/        @michael
 ```
 
-Schema PRs need all three people. Trevor-only PRs need Trevor + one other.
+Schema PRs: all three. Trevor PRs: Trevor + one other reviewer.
+
+## Collision rule
+
+Two agents must not write the same file. Leases in [parallel.md](parallel.md). If you find yourself editing `sdk/` and `infra/` in one session and you are a subagent, you are out of spec — split.

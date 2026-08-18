@@ -1,19 +1,20 @@
 # Workflow
 
-1. Read `PLAN.md`, then `skills/trevor-recorder/SKILL.md`, then `contracts/span.schema.json`.
-2. Claim a lease ([parallel.md](parallel.md)). Refuse overlap.
-3. Work only in leased paths ([ownership.md](ownership.md)).
-4. Tests first for SDK emit.
-5. Do not `terraform apply` or start servers unless the human asked.
-6. Stop at lane boundaries. Note URL, env names, fixture path ([handoffs.md](handoffs.md)).
-7. Release the lease.
+1. Read `PLAN.md`.
+2. Read `skills/trevor-recorder/SKILL.md`.
+3. Read **one** `agents/*.md` matching your id.
+4. Lease paths. Stop on overlap.
+5. Implement only those paths. Tests first on SDK.
+6. No `terraform apply`, no servers, no commit unless the human asked.
+7. Handoff note if blocked.
+8. Release lease.
 
-## Done
+## Done (lane)
 
-- [ ] Schema exists; SDK golden test passes
-- [ ] Demo emits one multi-span flight
-- [ ] `demo_pii_flight.sh` is the judge trigger
-- [ ] Terraform plan: Cognito two users, KMS, WAF, TTL, OIDC-ready
-- [ ] CI fails on secrets; deploys only `main`
-- [ ] No writes under `vault/` or `web/`
-- [ ] Public URL kept alive after first human-approved apply
+- [ ] SDK golden + nesting + no-raw-log tests
+- [ ] Demo fake-bedrock span graph test
+- [ ] `scripts/demo_pii_flight.sh`
+- [ ] Terraform validate; plan has Cognito, KMS, WAF, TTL, OIDC
+- [ ] gitleaks + trivy workflows
+- [ ] Zero files under `vault/` or `web/` from Trevor
+- [ ] Human-approved apply then URL kept alive

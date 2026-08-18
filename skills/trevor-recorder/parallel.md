@@ -1,22 +1,12 @@
-# Parallel agents (one machine)
+# Parallel agents
 
-One agent = one id = one exclusive path set. Shared mutable state is `contracts/` only (read-only after hour 0).
+This repo will be hammered by several LLMs on one machine. They collide unless you follow this.
 
-## Identities
+## Before first write
 
-| Agent id | Exclusive paths | Done when |
-|---|---|---|
-| `trevor-sdk` | `sdk/` | Golden span validates against `contracts/span.schema.json` |
-| `trevor-demo` | `demo-app/` | Demo emits one RAG+tool+LLM flight via the SDK |
-| `trevor-scripts` | `scripts/` | `demo_pii_flight.sh` runs (email + fake SSN in the prompt) |
-| `trevor-infra` | `infra/` | `terraform plan` for API GW, Lambda stubs, S3, DDB, Cognito, CloudFront, WAF, KMS, TTL=7d |
-| `trevor-ci` | `.github/`, `Makefile` | `gitleaks` + `trivy` on every PR; path filters; OIDC; deploy `main` only |
-
-Do not start a second agent on a path that already has a live lease.
-
-## Leases
-
-Gitignored file at repo root: `.agent-leases.json`
+1. Choose **one** id from the table in `SKILL.md`.
+2. Open **only** `agents/<that>.md`.
+3. Create/update `.agent-leases.json` at repo root (gitignored).
 
 ```json
 {
@@ -25,31 +15,40 @@ Gitignored file at repo root: `.agent-leases.json`
       "agent": "trevor-sdk",
       "paths": ["sdk/"],
       "host": "local",
-      "started": "ISO-8601"
+      "started": "2026-08-18T19:00:00Z"
     }
   ]
 }
 ```
 
-1. Overlapping path + lease younger than 4h → **do not write**. Pick a free id or stop.
-2. Release the object when done.
-3. Never lease `contracts/`, `vault/`, or `web/`.
-4. Human Trevor session may hold `trevor-infra` + `trevor-ci` together. Subagents may not.
+If another lease overlaps your paths and `started` is less than four hours ago: **do not write**. Say you are blocked. Do not delete someone else’s lease.
+
+Human Trevor (interactive) may lease `infra/` + `.github/` together. Subagents: one id.
 
 ## Worktrees
-
-`.worktrees/<agent-id>/` (gitignored). Branch: `trevor/<agent-id>/<slug>`. Merge via PR. No shared dirty tree.
 
 ```bash
 git worktree add .worktrees/trevor-sdk -b trevor/sdk/golden-span
 ```
 
-If already in a worktree, do not nest another.
+`.worktrees/` is gitignored. Branch names: `trevor/<id>/<slug>`. Merge with PRs. Do not `git stash` another agent’s files. Do not nest worktrees. If `git rev-parse --git-common-dir` differs from `--git-dir`, you are already in a worktree — stay there.
 
-## Dispatch
+## Order
 
-After hour-0 schema exists, **parallel**: `trevor-sdk`, `trevor-infra`, `trevor-ci`.
+Hour 0 humans: real `contracts/span.schema.json`. Until then use `span.schema.draft.json`.
 
-**Then**: `trevor-demo` (needs SDK import), `trevor-scripts` (needs demo entrypoint).
+Parallel immediately: `trevor-sdk`, `trevor-infra`, `trevor-ci`.
 
-Integrate by merging PRs, not by copying files across worktrees.
+After SDK is importable: `trevor-demo`. After demo CLI exists: `trevor-scripts`.
+
+Do not copy files between worktrees. PR merge is the integrate step.
+
+## Prompt to paste into a parallel agent
+
+```
+You are trevor-sdk. Load PLAN.md and skills/trevor-recorder/SKILL.md
+then execute skills/trevor-recorder/agents/sdk.md only.
+Do not edit vault/ or web/. Do not commit unless I ask.
+```
+
+Replace `sdk` with `demo`, `scripts`, `infra`, or `ci`.

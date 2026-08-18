@@ -1,12 +1,15 @@
-# Enterprise bar (Trevor-owned)
+# Enterprise bar
 
-- Secrets: env + Secrets Manager. Never commit `.env`, keys, Bedrock creds, Cognito secrets.
-- AWS auth: GitHub OIDC. No `AKIA` in Actions.
-- Tenants: two demo keys (`tenant-a`, `tenant-b`). SDK sends `tenant_id` on every span.
-- Prompts: Alexis redacts at the door. Prefer client-side hash when marked sensitive. **Never log raw prompts.**
-- Network: TLS, WAF on API Gateway, no public SSH `:22`, no public S3 list.
-- Data plane in Terraform: S3 SSE-KMS, DynamoDB encryption, TTL 7d, IAM least privilege. No `*` on `s3:` or `dynamodb:` except a documented exception.
-- CI: `gitleaks`, `trivy fs`, `bandit` on Python, `terraform plan` on `infra/**`. Deploy only from `main`.
-- No Grafana as product UI. No Langfuse as store. No EKS/AKS.
+Trevor’s slice of “observability must not become a data-leakage mechanism.”
 
-Kill order if time slips: extra span kinds → extra Terraform niceties. Never kill: schema-valid emit, two tenants, demo script, OIDC/CI, live URL.
+- No secrets in git. Secrets Manager + env. `.env` gitignored.
+- GitHub Actions authenticates with **OIDC**. If you are about to paste `AKIA...`, stop.
+- Two tenants in the demo. Every span has `tenant_id`. Wrong tenant is Alexis’s 403, but Trevor must not mix keys.
+- Never log raw prompts. `sensitive=True` hashes and masks before any logger.
+- TLS everywhere. WAF on the HTTP API. No SSH `:22` to `0.0.0.0/0`. S3 public access block.
+- KMS on payload bucket and table. DynamoDB TTL 7 days (`expires_at`).
+- IAM: no `Action = "*"` on `s3` or `dynamodb` without a comment the human accepted.
+- CI: gitleaks, trivy, bandit, terraform validate. Deploy **main only**.
+- Grafana is not a deliverable. InnerAI already did “wrap the LLM and dump logs.” We do not.
+
+Time-slip cuts: extra span kinds, CloudTrail, fancy dashboards in AWS console. Never cut: schema-valid emit, two tenants, demo script, OIDC, public URL after approved apply.

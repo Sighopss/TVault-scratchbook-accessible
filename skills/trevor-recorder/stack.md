@@ -1,29 +1,44 @@
-# Stack (locked)
+# Stack
 
-- Python 3.12 + `uv` — `sdk/`, `demo-app/`
-- Terraform >= 1.9 — `infra/`
-- GitHub Actions YAML — `.github/workflows/`
-- Amazon Bedrock (Claude or Nova), default region `us-east-1`
-- AWS: API Gateway HTTP API, Lambda (handlers are Alexis), S3, DynamoDB, Cognito, CloudFront, WAF, KMS, Secrets Manager, CloudTrail
-- Shell: GNU coreutils. No PowerShell. Prefer WSL2 for runs.
-- Pins: `pydantic>=2`, `boto3`, `opentelemetry-api` (span **shape** only), `pytest`, `bandit`
+Locked. Do not substitute.
 
-## Span shape
+| Piece | Choice |
+|---|---|
+| SDK / demo | Python 3.12, `uv` |
+| IaC | Terraform >= 1.9, AWS provider ~> 5 |
+| CI | GitHub Actions, OIDC |
+| Model | Amazon Bedrock Claude or Nova, `us-east-1` |
+| Shell | GNU coreutils, WSL2, no PowerShell |
+| Python libs | `pydantic>=2`, `boto3`, `httpx`, `opentelemetry-api` (shape only), `pytest`, `bandit` |
 
-SDK wraps Bedrock `converse` and one RAG retrieve. POST OTel-shaped JSON, not a vendor backend:
+Not in Trevor’s stack: Next.js (Michael), Presidio (Alexis), Grafana, Langfuse, EKS, OpenSearch, CDK.
 
-`trace_id`, `span_id`, `parent_id`, `tenant_id`, `kind` in `llm|tool|rag|http`, `gen_ai.request.model`, tokens, `cost_usd`, timestamps, status.
+## Span payload
 
-OTel is not the database. POST to Alexis ingest. If ingest is down, write golden JSON beside fixtures; keep HTTP behind an interface.
+POST `/v1/traces`:
 
-## Defaults
+```json
+{ "spans": [ { "...TraceVaultSpan" : true } ] }
+```
 
-**SDK:** package `sdk/tracevault/`. `start_span` / `end_span` / `flush`. Contextvar for `trace_id` + `parent_id`. pytest golden vs schema.
+Required span keys: `trace_id`, `span_id`, `tenant_id`, `kind`, `name`, `status`, `start_time`, `end_time`.
 
-**Demo:** 3–5 markdown docs, Bedrock embeddings, in-memory top-k, one tool, one `converse`. Not a product.
+`kind`: `llm` | `tool` | `rag` | `http`.
 
-**Script:** `scripts/demo_pii_flight.sh` — `set -euo pipefail`, no secrets in argv.
+`tenant_id`: `tenant-a` | `tenant-b`.
 
-**Terraform:** stacks `dev` and `prod`. Lambda handler stub until Alexis supplies the real one; still wire IAM, env, API route. CloudFront origin empty until Michael’s build exists.
+Draft schema: `span.schema.draft.json`. Promote to `contracts/span.schema.json` at hour 0.
 
-**Makefile:** `make test`, `make demo`, `make plan`. Unix recipes.
+## Env
+
+```
+TRACEVAULT_INGEST_URL
+TRACEVAULT_TENANT_KEY
+TRACEVAULT_TENANT_ID
+AWS_REGION
+BEDROCK_MODEL_ID
+BEDROCK_EMBED_MODEL_ID
+TRACEVAULT_FAKE_BEDROCK
+```
+
+Never hardcode. Never commit values.
