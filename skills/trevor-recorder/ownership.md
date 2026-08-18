@@ -15,9 +15,13 @@ If the task is “fix the waterfall” or “add Presidio”: stop. That is not 
 /sdk/        @trevor
 /demo-app/   @trevor
 /infra/      @trevor
+/scripts/    @trevor
+/Makefile    @trevor
 /.github/    @trevor
 /vault/      @alexis
 /web/        @michael
+/PRODUCT.md  @michael
+/DESIGN.md   @michael
 ```
 
 Schema PRs: all three. Trevor PRs: Trevor + one other reviewer. **Only Trevor merges any PR into `main`.**

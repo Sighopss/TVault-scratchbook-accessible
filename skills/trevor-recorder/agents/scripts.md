@@ -20,8 +20,8 @@ scripts/check_unix.sh
 set -euo pipefail
 # cd repo root (script may be invoked from anywhere)
 # require python/uv
-# export TRACEVAULT_TENANT_ID=tenant-b
-# run: uv run python -m demo_app.main --pii --tenant tenant-b --question "What is retention?"
+# export TRACEVAULT_TENANT_ID=tenant-a
+# run: uv run python -m demo_app.main --pii --tenant tenant-a --question "What is retention?"
 # print "flight emitted" and ingest URL (not keys)
 ```
 

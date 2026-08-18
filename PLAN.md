@@ -41,10 +41,10 @@ This is the shareable plan. Nothing is built yet. If a task is not on the judge 
 
 | Winner | What they actually shipped | Steal (operating system) | Improve (our edge) |
 |---|---|---|---|
-| **HemoStat** | 4 Python agents, Redis JSON protocol, `docker compose up`, CPU-spike demo script, cooldown/audit/dry-run, `uv` + Makefile + team setup guide | One package per person. Frozen JSON contract *before* code. `scripts/demo_pii_flight.sh` as the CPU-spike equivalent. Fail-closed safety. `make quality`. | Their dashboard was Streamlit. Ours is a real Next.js Flight Recorder. Their safety was container restarts. Ours is **write-time redaction + tenant 403**. No Prometheus theater. |
+| **HemoStat** | 4 Python agents, Redis JSON protocol, `docker compose up`, CPU-spike demo script, cooldown/audit/dry-run, `uv` + Makefile + team setup guide | One package per person. Frozen JSON **and HTTP** contract *before* code (`contracts/http.md` = their `API_PROTOCOL.md`). `scripts/demo_pii_flight.sh` as the CPU-spike equivalent. Fail-closed safety. `make quality`. | Their dashboard was Streamlit. Ours is a real Next.js Flight Recorder. Their safety was container restarts. Ours is **write-time redaction + tenant 403**. No Prometheus theater. |
 | **Vulnerability-Resolution-Agent** | FastAPI ingest separate from MCP. HMAC webhook tests (`test_hmac.py`). Slack. Terraform (they pointed it at AKS). | Isolated ingest service. Security as a **runnable test** judges can watch fail. HMAC-style negative tests. | Do not copy AKS or the leftover Next.js component dump. Point Terraform at **serverless AWS**. Tests prove **PII never at rest** and **cross-tenant 403**, not just webhook signatures. |
 | **InnerAI** (same observability track) | FastAPI middleware wrapping LLM calls. Metrics + dashboard + fake user. Local `fastapi dev`. CSV / `gemini_calls.log`. | SDK wraps the model call (`APIWrapper` idea). Four-module split: wrapper, vault, UI, demo user. | They logged **plaintext prompts**. We hash + mask **before S3/Dynamo**. They were localhost. We have a **public AWS URL**. They had no tenants. We demo two Cognito users. |
-| **InsightAI Minions** | OTel metrics → VictoriaMetrics → Grafana. GitHub Actions redeploys the LLM under test. Slack alerts. | CI deploys the **workload being observed**, not just the platform. Use `gen_ai.*` attribute names. | They shipped KPIs (latency, tokens). We ship a **reconstructed flight** (spans, RAG hops, tools). Grafana is not our UI. |
+| **InsightAI Minions** | OTel metrics → VictoriaMetrics → Grafana. GitHub Actions redeploys the LLM under test. Slack alerts. | CI deploys the **workload being observed** (demo-app) **and** the UI, not just the platform. Use `gen_ai.*` attribute names. | They shipped KPIs (latency, tokens). We ship a **reconstructed flight** (spans, RAG hops, tools). Grafana is not our UI. |
 | **GenA11yHelper** | Terraform + EC2 + Docker + Streamlit + public IP in an 8h window. S3 for prompt versions. | IaC from hour 0. Tiny scope. URL on the slide. | No EC2. No SSH `:22` open to the world. Serverless + Cognito. Prompt testing is not our product; **trace governance** is. |
 
 **The trap:** InnerAI already occupied “middleware around the LLM.” Minions already occupied Grafana KPIs. Shipping a wrapper + dashboards with no redaction is a weaker InnerAI. Governance is the only new scoring surface on this brief.
@@ -70,33 +70,36 @@ One Flight Recorder. Challenge ideas are **views**, not three extra products.
 3. `sdk/tracevault/`: `start_span` / `end_span` wrapping Bedrock `converse` and one RAG retrieve. Emits OTel-shaped JSON (`trace_id`, `span_id`, `parent_id`, `tenant_id`, `kind`: `llm|tool|rag|http`, `gen_ai.request.model`, tokens, `cost_usd`). **Does not send raw prompts** if the caller marked them sensitive; still Alexis redacts at the door.
 4. `demo-app/`: 3–5 markdown docs in S3, embed, top-k retrieve, one tool call, one LLM answer. Two tenant API keys.
 5. `scripts/demo_pii_flight.sh`: runs the demo with `user@example.com` and a fake SSN in the prompt. This is HemoStat’s CPU spike.
-6. Terraform: API Gateway, Lambda (Alexis wires handlers), S3, DynamoDB, Cognito user pool (`viewer`/`admin`), CloudFront for `web/`, WAF, KMS, TTL=7d.
-7. GitHub Actions: path-filtered tests; deploy `main` → `dev` then `prod`.
+6. Terraform: HTTP API (CORS + JWT authorizer + API key ingest), **two** Lambdas (`vault-ingest`, `vault-read`), S3, DynamoDB, Cognito (`custom:tenant_id`), CloudFront + web sync, WAF, KMS, TTL=7d, remote state, `/health` mock, 5xx alarm, log retention 7d.
+7. GitHub Actions: path-filtered tests **including** `vault/**` and `web/**`; deploy `main` → terraform apply → `web/` sync → CloudFront invalidation. Rollback = re-run last green deploy.
 8. Keep the AWS URL alive for judging.
 
 ### Alexis — exact work
 
 0. **Before vault code:** copy `skills/lane-constitution/` into `skills/<your-lane>/`. Same files and parallel rules as the rest of the team. Write **your** `SKILL.md` and missions. Do not copy `trevor-recorder/`. Do not run parallel agents against a single `PLAN.md` blob.
-1. `vault/ingest/`: HTTP API, Cognito/API-key auth, JSON Schema validate, enqueue.
+1. `vault/ingest/`: HTTP API handler. Auth = `X-Tenant-Key` only (not Cognito). JSON Schema validate. Call redact then store. `202` or fail-closed `400 redaction_failed`.
 2. `vault/redact/`: Presidio + deny-list (SSN, email, AWS keys, `sk-` tokens). Prompt body → `prompt_hash` + `prompt_preview` (masked). **Fail closed:** if redaction errors, drop the payload, do not store raw.
 3. `vault/store/`: S3 SSE-KMS under `s3://…/{tenant_id}/{trace_id}/`. DynamoDB PK=`tenant_id`, SK=`trace_id`. IAM condition keys on tenant.
-4. `vault/read/`: list/get spans. Cognito JWT. Cross-tenant get → **403**.
-5. `vault/audit/`: every GET of a trace writes `{actor, tenant_id, trace_id, ts}`.
-6. Tests (VRA `test_hmac.py` pattern): fixture with SSN must not appear in S3/Dynamo; tenant-a token cannot read tenant-b; missing auth → 401.
-7. Cost fields: persist `cost_usd` and token counts Alexis does not invent — Trevor emits them, Alexis stores them redacted.
+4. `vault/read/`: implement `GET /v1/traces` and `GET /v1/traces/{trace_id}` exactly as `contracts/http.md`. Cognito JWT. `custom:tenant_id` mismatch → **403**. Error JSON as contracted.
+5. `vault/audit/`: every GET of a trace writes `{actor, tenant_id, trace_id, ts}`. Serve `GET /v1/traces/{trace_id}/audit`.
+6. `vault/handlers/ingest.py` and `vault/handlers/read.py` — the two Lambda entrypoints Trevor zips. Packages stay split; functions do not.
+7. Tests (VRA `test_hmac.py` pattern): fixture with SSN must not appear in S3/Dynamo; tenant-a JWT cannot read tenant-b (`403`); missing auth → `401` with contracted JSON.
+8. Cost fields: persist `cost_usd` and token counts Alexis does not invent — Trevor emits them, Alexis stores them redacted.
+9. Fill `skills/<your-lane>/` missions from `lane-constitution/` covering the modules above. Do not copy `trevor-recorder/`.
 
 ### Michael — exact work
 
 0. **Before Next.js:** copy `skills/lane-constitution/` into `skills/<your-lane>/` (same format, your content), then Impeccable (`PRODUCT.md`). Do not copy `trevor-recorder/`. Do not open `web/` until both exist.
 1. Before the weekend: Impeccable prep (section below). Do not open Next.js until `PRODUCT.md` exists.
-2. `web/`: Next.js App Router. Four screens: sign-in (Cognito hosted UI), flight list, flight waterfall, audit/tenant strip.
-3. Day 1 renders `contracts/fixtures/tenant-a-rag.json` with **no API**. Day 2 swaps the fetcher to Alexis’s read API.
+2. `web/`: Next.js 15 App Router, `output: 'export'`. Four screens: sign-in (Cognito hosted UI), flight list, flight waterfall, audit/tenant strip. Flight detail via `?trace_id=` (no dynamic `[id]` routes).
+3. Day 1 renders `contracts/fixtures/tenant-a-rag.json` with **no API**. Day 2 swaps the fetcher to `GET /v1/traces*` in `contracts/http.md`. Env: `NEXT_PUBLIC_API_URL` + Cognito `NEXT_PUBLIC_*` from Trevor outputs. Do not hardcode URLs.
 4. Waterfall: llm / rag / tool / http spans, parent-child, latency, tokens, `$`.
 5. RAG hop panel: query (masked), retrieved doc ids, scores.
 6. Badges: `REDACTED`, tenant id, TTL remaining.
-7. Tenant switcher. Direct ID fetch as the other user must show 403 in the UI.
-8. Thin RCA: if a span `status=error`, one panel lists the failing span + siblings. Optional one Bedrock call over **already-redacted** spans. Cut this first if time slips.
-9. Playwright: fixture A renders; fixture B shows masked preview not the SSN.
+7. Tenant switcher. Direct ID fetch as the other user must show **403** in the UI (parse contracted error JSON).
+8. Thin RCA: if a span `status=error`, one panel lists the failing span + siblings. Optional Bedrock over already-redacted spans. **Cut this.** Not in the 48h SaaS bar.
+9. Playwright: fixture A renders; fixture B shows masked preview not the SSN. One live test: tenant-b 403.
+10. Fill `skills/<your-lane>/` from `lane-constitution/`. Do not copy `trevor-recorder/`.
 
 ---
 
@@ -148,6 +151,29 @@ Until your folder exists, you are flying blind and will collide.
 
 ---
 
+## 48h production SaaS (locked)
+
+This is the bar. Not SOC2. Not a Grafana clone. A live multi-tenant app judges can sign into.
+
+**Must:** public HTTPS, two Cognito tenants, write+read APIs, PII never at rest, secrets not in git, deploy from `main` only, UI and API both live, `GET /health` 200, 5xx alarm, rollback = re-run last green deploy.
+
+**Must not (do not build):** custom domain, multi-region, PITR, CloudTrail-as-SIEM, billing, SOC2, pager, RCA-via-Bedrock.
+
+**Freeze before lane code (HemoStat):** `contracts/span.schema.json` **and** `contracts/http.md` (draft in this scratchpad: `contracts/http.draft.md`). Same hour 0. No second API.
+
+| Remaining join | Trevor | Alexis | Michael |
+|---|---|---|---|
+| HTTP routes + error JSON | API GW, CORS, JWT authorizer, API-key ingest, `/health` mock | Handlers + tests against the contract | Fetcher + 403 UI |
+| `custom:tenant_id` | Cognito users + attribute | Enforce on every GET | Hosted UI; do not invent a second tenant field |
+| Two Lambdas | `vault-ingest`, `vault-read` zip from `vault/` | Five packages + two handler files | — |
+| Web live | S3 sync + invalidation on `main` | — | `output: 'export'`, `NEXT_PUBLIC_*` |
+| CI | `vault.yml` + `web.yml` + deploy | pytest fail-closed | Playwright |
+| Ops | Remote state, log retention 7d, 5xx alarm | Never log raw prompts | CSP via CloudFront headers Trevor adds |
+
+Alexis/Michael still write **their own** skill missions for the rows they own. The format is `lane-constitution/`. The contract is this table + `contracts/http.draft.md`.
+
+---
+
 ## Repo layout
 
 Target tree of the **product** repo (not this scratchpad):
@@ -156,6 +182,7 @@ Target tree of the **product** repo (not this scratchpad):
 TraceVault/
   contracts/
     span.schema.json
+    http.md            # hour 0 — copy from scratchpad contracts/http.draft.md
     fixtures/
       tenant-a-rag.json
       tenant-b-pii.json
@@ -167,6 +194,7 @@ TraceVault/
     store/
     read/
     audit/
+    handlers/          # ingest.py + read.py — Lambda entrypoints Trevor zips
   web/                 # Michael  TypeScript / Next.js 15
   infra/               # Trevor   Terraform
   scripts/
@@ -185,7 +213,7 @@ TraceVault/
     <michael-lane>/    # Michael: same format, his SKILL.md + missions
 ```
 
-Hour 0 (all three, 90 minutes): lock `span.schema.json` + both fixtures. No lane code before that file exists. This is HemoStat’s `API_PROTOCOL.md`.
+Hour 0 (all three, 90 minutes): lock `span.schema.json` + `http.md` + both **full flight** fixtures (not single spans). No lane code before those files exist. This is HemoStat’s `API_PROTOCOL.md`.
 
 ---
 
@@ -268,6 +296,7 @@ Flight = one trace. Span kinds: llm, tool, rag, http. Vault = ingest+redact+stor
 - Presidio hello-world on WSL: mask one SSN, one email, one AWS key.
 - Write the deny-list on paper: what is hashed, masked, dropped.
 - `pytest` layout ready: `vault/tests/test_redact_pii.py`, `test_tenant_isolation.py`.
+- Copy `lane-constitution/` and read `contracts/http.draft.md` so missions match the HTTP freeze.
 
 ### Trevor — before the weekend
 
@@ -283,14 +312,14 @@ Flight = one trace. Span kinds: llm, tool, rag, http. Vault = ingest+redact+stor
 | Window | Trevor | Alexis | Michael |
 |---|---|---|---|
 | Hour −1 (prep) | Repo, OIDC, Bedrock enable | Presidio spike, deny-list | Impeccable init + tokens + shape |
-| Hour 0 (90m, together) | Schema file in git | Redaction rules on the schema | Fixture waterfall wireframe |
-| Day 1 AM | SDK + demo emits fixture-shaped JSON | Ingest + Dynamo/S3 persist | Waterfall + RAG hops on fixtures |
-| Day 1 PM | Demo → API Gateway | Presidio + audit writes | Cost overlay + tenant switcher |
-| Night | First Terraform apply | Isolation tests green | Empty/403/error states (`harden`) |
-| Day 2 AM | Prod URL, WAF, two Cognito users | Leak tests against live S3 | Point UI at read API, Playwright |
-| Day 2 PM | Keep URL alive | Judge questions on governance | Click-through |
+| Hour 0 (90m, together) | Schema + `http.md` in git; Cognito callback URL | Redaction rules + JWT 403 cases on the contract | Fixture waterfall + `NEXT_PUBLIC_*` names |
+| Day 1 AM | SDK + demo emits fixture-shaped JSON | Ingest handler + persist | Waterfall + RAG hops on fixtures |
+| Day 1 PM | API GW CORS + two Lambdas wired | Presidio + audit GET | Cost overlay + tenant switcher |
+| Night | First apply: `/health`, alarm, remote state | Isolation tests green | Empty/403/error (`harden`); static export builds |
+| Day 2 AM | Prod URL + `web/` sync + two users | Leak tests against live S3 | Point UI at read API, Playwright 403 |
+| Day 2 PM | Keep URL alive; re-run deploy = rollback drill | Judge questions on governance | Click-through |
 
-**Kill order if time slips:** RCA panel → cost charts (keep a single `$` total) → extra span kinds. **Never kill:** redaction, tenant 403, live AWS URL, fixture-backed UI.
+**Kill order if time slips:** RCA panel → cost charts (keep a single `$` total) → extra span kinds → CloudTrail. **Never kill:** redaction, tenant 403, live HTTPS URL, fixture-backed UI, `/health`, CORS, JWT→tenant.
 
 ---
 
@@ -327,9 +356,13 @@ Flight = one trace. Span kinds: llm, tool, rag, http. Vault = ingest+redact+stor
 /sdk/        @trevor
 /demo-app/   @trevor
 /infra/      @trevor
+/scripts/    @trevor
+/Makefile    @trevor
 /.github/    @trevor
 /vault/      @alexis
 /web/        @michael
+/PRODUCT.md  @michael
+/DESIGN.md   @michael
 ```
 
 PRs need the owning lane plus one other reviewer. Do not merge schema changes without all three. **Only Trevor merges the PR into `main`.**
@@ -344,10 +377,10 @@ PRs need the owning lane plus one other reviewer. Do not merge schema changes wi
 | `vault/**` | `pytest` + `bandit` — SSN fixture must fail-closed |
 | `web/**` | lint + Playwright against fixtures |
 | `sdk/**` `demo-app/**` | golden span matches `span.schema.json` |
-| `infra/**` | `terraform plan` |
-| Merge to `main` | apply `dev`, then `prod` |
+| `infra/**` | `terraform plan` (remote backend when configured) |
+| Merge to `main` | apply `dev` (then `prod` if approved) → sync `web/` → CloudFront invalidation |
 
-No deploy from feature branches. No CodePipeline. No per-PR AWS stacks. No agent or teammate merge to `main` — Trevor only.
+No deploy from feature branches. No CodePipeline. No per-PR AWS stacks. No agent or teammate merge to `main` — Trevor only. Rollback = re-run the previous successful `deploy.yml`.
 
 ---
 

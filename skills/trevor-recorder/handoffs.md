@@ -2,7 +2,9 @@
 
 You do not implement Alexis or Michael. You leave them a file they can drop into their agent.
 
-Write `handoffs/FROM-trevor-<id>.md` (gitignored or committed only if the human asked). Template:
+HTTP is `contracts/http.draft.md` until hour 0, then `contracts/http.md`. Do not invent routes.
+
+Write `handoffs/FROM-trevor-<id>.md` (gitignored unless the human asked). Template:
 
 ```markdown
 # Handoff from trevor-<id>
@@ -14,22 +16,24 @@ Blocked on: Alexis | Michael | Human
 - outputs / env vars:
 
 ## What I need
-- ingest URL:
-- header name:
-- web dist dir for CloudFront:
+- vault handlers present? (ingest.py / read.py)
+- web export dir (`web/out` or whatever `next export` wrote):
 
 ## Contract reminder
-POST /v1/traces  body: { "spans": [ TraceVaultSpan, ... ] }
-Header: X-Tenant-Key
+See contracts/http.md
+POST /v1/traces  X-Tenant-Key
+GET  /v1/traces*  Authorization Bearer (Cognito)
+GET  /health
 ```
 
 ## Direction table
 
 | Direction | Payload | Other owner |
 |---|---|---|
-| Trevor → Alexis | Schema-valid spans, HTTPS, tenant key | ingest Lambda |
-| Alexis → Trevor | `TRACEVAULT_INGEST_URL`, 401/403 JSON | Alexis |
-| Trevor → Michael | Fixture-shaped JSON; later CloudFront URL; Cognito users | `web/` |
-| Michael → Trevor | Static export path for CloudFront origin | Michael |
+| Trevor → Alexis | `api_url`, table, bucket, KMS, secret ARNs, JWT issuer | two Lambdas |
+| Alexis → Trevor | `vault/handlers/*.py` so zips are not empty stubs | Trevor `lambda.tf` |
+| Trevor → Michael | `cloudfront_url`, `NEXT_PUBLIC_*` (api, pool, client, domain, region) | `web/` |
+| Michael → Trevor | static export directory for `s3 sync` | `deploy.yml` |
+| Alexis → Michael | `401/403` JSON as contracted; list/get/audit shapes | fetcher |
 
 UI labels = schema names: `trace_id`, `tenant_id`, `prompt_preview`, `cost_usd`.

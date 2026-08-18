@@ -23,4 +23,4 @@ Blocked on: <other-human> | Human
 
 ## Direction table
 
-Fill rows for **your** I/O with the other two humans. UI labels = schema names from `contracts/` after hour 0.
+Fill rows for **your** I/O with the other two humans. After hour 0, HTTP is `contracts/http.md` — do not invent routes. UI labels = schema names from `contracts/` after hour 0.
