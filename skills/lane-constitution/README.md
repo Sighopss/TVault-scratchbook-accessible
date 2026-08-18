@@ -1,9 +1,13 @@
-# Lane constitution — format only
+# Lane constitution — shared format
 
-Copy **this folder** to `skills/<your-lane>/`. Fill every `<placeholder>`. Delete this README in the copy.
+This folder is the **team format**. Trevor, Alexis, and Michael all keep these files and these parallel rules. That is what enforces parallel LLMs and three-person handoffs.
 
-Do **not** copy `skills/trevor-recorder/`. That folder is Trevor’s filled lane. Different work. Different missions. Do not reuse his agent ids, paths, APIs, env vars, or tests.
+Copy **this folder** to `skills/<your-lane>/`. Keep every filename. Do not rewrite `parallel.md` / `ownership.md` / `handoffs.md` rules — only fill `<placeholders>`.
 
-You decide how to split **your** work into missions. One agent opens one `agents/<mission>.md`.
+Then write **your** `SKILL.md` body and `agents/<mission>.md` files for your slice.
+
+Do **not** copy `skills/trevor-recorder/`. That is Trevor’s filled content (his missions, paths, APIs). Same format, different content.
+
+One agent opens one `agents/<mission>.md`.
 
 Then mirror `SKILL.md` to `.cursor/skills/<your-lane>/SKILL.md`, `.claude/skills/<your-lane>/SKILL.md`, `.kiro/skills/<your-lane>/SKILL.md`. Add paste blocks to repo-root `AGENTS.md`. Register the folder in `skills/INDEX.md`.

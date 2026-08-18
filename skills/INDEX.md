@@ -1,10 +1,10 @@
 # Skills index
 
-Load **one lane**. Alexis and Michael: copy `lane-constitution/`, not `trevor-recorder/`. Do not run a lane off `PLAN.md` alone.
+Load **one lane**. Format is `lane-constitution/` for everyone. Content is per owner. Do not run a lane off `PLAN.md` alone.
 
 | Lane | Owner | Load |
 |---|---|---|
-| Format (empty) | — | [lane-constitution/](lane-constitution/) — copy this folder, fill placeholders |
+| Format (empty) | all three | [lane-constitution/](lane-constitution/) — identical files + parallel rules. Copy, then write your own SKILL/missions. |
 | Recorder + AWS | Trevor | [trevor-recorder/SKILL.md](trevor-recorder/SKILL.md) then one [agents/*.md](trevor-recorder/agents/). **Trevor only.** |
 | Vault | Alexis | `skills/<alexis-lane>/` — **not written yet**. Copy `lane-constitution/`. Until it exists, `PLAN.md` only. |
 | Explorer | Michael | `skills/<michael-lane>/` — **not written yet**. Copy `lane-constitution/`. Until it exists, `PLAN.md` + Impeccable only. |

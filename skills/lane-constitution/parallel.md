@@ -1,6 +1,6 @@
 # Parallel agents
 
-Several LLMs on one machine collide unless you follow this. This is the shared protocol. Fill ids and paths for **your** lane only.
+Several LLMs on one machine collide unless you follow this. These rules are the **shared format**. Do not rewrite them. Fill ids and paths for **your** lane only.
 
 ## Before first write
 

@@ -76,7 +76,7 @@ One Flight Recorder. Challenge ideas are **views**, not three extra products.
 
 ### Alexis — exact work
 
-0. **Before vault code:** copy `skills/lane-constitution/` into **your own** folder (`skills/<your-lane>/`). Fill it with your paths and missions. Do not copy `trevor-recorder/`. Do not run parallel agents against a single `PLAN.md` blob.
+0. **Before vault code:** copy `skills/lane-constitution/` into `skills/<your-lane>/`. Same files and parallel rules as the rest of the team. Write **your** `SKILL.md` and missions. Do not copy `trevor-recorder/`. Do not run parallel agents against a single `PLAN.md` blob.
 1. `vault/ingest/`: HTTP API, Cognito/API-key auth, JSON Schema validate, enqueue.
 2. `vault/redact/`: Presidio + deny-list (SSN, email, AWS keys, `sk-` tokens). Prompt body → `prompt_hash` + `prompt_preview` (masked). **Fail closed:** if redaction errors, drop the payload, do not store raw.
 3. `vault/store/`: S3 SSE-KMS under `s3://…/{tenant_id}/{trace_id}/`. DynamoDB PK=`tenant_id`, SK=`trace_id`. IAM condition keys on tenant.
@@ -87,7 +87,7 @@ One Flight Recorder. Challenge ideas are **views**, not three extra products.
 
 ### Michael — exact work
 
-0. **Before Next.js:** copy `skills/lane-constitution/` into **your own** folder, fill it, then Impeccable (`PRODUCT.md`). Do not copy `trevor-recorder/`. Do not open `web/` until both exist.
+0. **Before Next.js:** copy `skills/lane-constitution/` into `skills/<your-lane>/` (same format, your content), then Impeccable (`PRODUCT.md`). Do not copy `trevor-recorder/`. Do not open `web/` until both exist.
 1. Before the weekend: Impeccable prep (section below). Do not open Next.js until `PRODUCT.md` exists.
 2. `web/`: Next.js App Router. Four screens: sign-in (Cognito hosted UI), flight list, flight waterfall, audit/tenant strip.
 3. Day 1 renders `contracts/fixtures/tenant-a-rag.json` with **no API**. Day 2 swaps the fetcher to Alexis’s read API.
@@ -100,19 +100,19 @@ One Flight Recorder. Challenge ideas are **views**, not three extra products.
 
 ---
 
-## Skills constitution (format, not Trevor’s lane)
+## Skills constitution (same format, your content)
 
-Alexis and Michael each keep a **separate** skills folder. Do not clone `skills/trevor-recorder/`. That directory is Trevor’s filled work (his missions, paths, APIs, env). Your work is different. Copying it will leak the wrong constitution into your agents.
+**Format is shared. Content is not.** All three lanes use the **same** constitution files and the **same** parallel rules. That is what makes several LLMs on one machine, and three humans on one repo, not collide. If Alexis or Michael invent a different layout, parallel work is not enforced.
 
-Copy **`skills/lane-constitution/`** instead. Placeholders only: file names, load order, leases, worktrees, one-mission-per-agent, handoffs. You fill `<your-lane>`, `<write-paths>`, missions, stack, tests. You choose how to split **your** slice. Do not split the way Trevor split his.
+Copy **`skills/lane-constitution/`** into `skills/<your-lane>/`. Keep every file. Keep the rules in `parallel.md` / `ownership.md` / `handoffs.md` (one id → one path, leases, worktrees, PRs, Trevor merges, never write another lane).
 
-The point: several LLMs on one laptop without collisions, and three humans handing off without editing the wrong tree.
+Then **write your own** `SKILL.md` body and `agents/<mission>.md` files for **your** slice. Missions, paths, APIs, tests, stack pins — yours. Do not clone `skills/trevor-recorder/`. That is Trevor’s filled content, not the format.
 
-Live copy belongs in the **product** repo. This scratchpad is the format + Trevor’s own lane.
+Live copy belongs in the **product** repo. This scratchpad holds the shared format plus Trevor’s filled lane.
 
-### File set (mandatory)
+### File set (mandatory, identical on every lane)
 
-Each lane is a folder of markdown, not a vibe. Start from `skills/lane-constitution/`:
+Do not rename, skip, or merge these files. Divergence = parallel work is not enforced. Start from `skills/lane-constitution/`:
 
 ```text
 skills/<your-lane>/
@@ -131,7 +131,7 @@ Mirror `SKILL.md` into `.cursor/skills/<your-lane>/`, `.claude/skills/<your-lane
 
 ### Parallel on one computer
 
-Protocol is in `skills/lane-constitution/parallel.md` (not Trevor’s filled `parallel.md`):
+Protocol is identical in every lane. Copy `skills/lane-constitution/parallel.md` and fill only ids/paths. Do not rewrite the rules:
 
 - One agent id, one mission file, one path set. Subagents do not implement the entire lane.
 - Lease paths in **repo-root** `.agent-leases.json` (shared across all three humans). If a lease overlaps, stop. Do not delete someone else’s lease.
@@ -179,10 +179,10 @@ TraceVault/
   AGENTS.md            # paste blocks for parallel agents
   skills/
     INDEX.md
-    lane-constitution/ # FORMAT to copy — not Trevor’s filled lane
-    trevor-recorder/   # Trevor only. Do not copy.
-    <alexis-lane>/     # Alexis copies lane-constitution here and fills it
-    <michael-lane>/    # Michael copies lane-constitution here and fills it
+    lane-constitution/ # shared FORMAT — identical files + parallel rules
+    trevor-recorder/   # Trevor’s filled content. Same format. Do not copy his missions.
+    <alexis-lane>/     # Alexis: same format, her SKILL.md + missions
+    <michael-lane>/    # Michael: same format, his SKILL.md + missions
 ```
 
 Hour 0 (all three, 90 minutes): lock `span.schema.json` + both fixtures. No lane code before that file exists. This is HemoStat’s `API_PROTOCOL.md`.
@@ -193,7 +193,7 @@ Hour 0 (all three, 90 minutes): lock `span.schema.json` + both fixtures. No lane
 
 ### All three — skills first, then coreutils
 
-Alexis and Michael: copy `skills/lane-constitution/` into your own folder **this week**, before vault/Next.js. Do not copy `trevor-recorder/`. If you skip the constitution, parallel agents will overwrite each other.
+Alexis and Michael: copy `skills/lane-constitution/` into your own folder **this week**. Same format as Trevor. Write your own skill/mission content. If you skip files or change the parallel rules, agents will collide.
 
 ### All three — coreutils and agent time
 
