@@ -1,6 +1,6 @@
 # AGENTS
 
-This repository is the TraceVault scratchbook (plan, brand, **Trevor** skills).
+This repository is the TraceVault **scratchpad** (plan, brand, **Trevor** skills). It is not the product repo. Do not implement `sdk/`, `vault/`, or `web/` here.
 
 You are an LLM coding agent. Do not invent a second product. Grafana is not the UI. Do not edit `vault/` or `web/` unless the human said you are Alexis or Michael.
 
