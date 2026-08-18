@@ -3,7 +3,7 @@
 **Id:** `trevor-ci`  
 **Write:** `.github/` and `Makefile` only
 
-You own the merge gate so parallel agents cannot land secrets or broken schema emits.
+You own CI checks that block a merge. You do not merge. Trevor merges feature branches into `main`.
 
 ## Files to create
 

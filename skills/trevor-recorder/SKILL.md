@@ -53,7 +53,7 @@ Claim a lease in `.agent-leases.json` (gitignored) before writing. One id, one p
 
 Human Trevor may hold infra+ci together. Subagents must not.
 
-Worktree: `.worktrees/<id>/` on branch `trevor/<id>/<slug>`. Do not nest worktrees. Do not share a dirty tree.
+Worktree: `.worktrees/<id>/` on branch `trevor/<id>/<slug>`. Open a PR. Do not merge — Trevor merges. Do not nest worktrees. Do not share a dirty tree.
 
 ## Stack (locked)
 

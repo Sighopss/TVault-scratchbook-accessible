@@ -31,7 +31,7 @@ Human Trevor (interactive) may lease `infra/` + `.github/` together. Subagents: 
 git worktree add .worktrees/trevor-sdk -b trevor/sdk/golden-span
 ```
 
-`.worktrees/` is gitignored. Branch names: `trevor/<id>/<slug>`. Merge with PRs. Do not `git stash` another agent’s files. Do not nest worktrees. If `git rev-parse --git-common-dir` differs from `--git-dir`, you are already in a worktree — stay there.
+`.worktrees/` is gitignored. Branch names: `trevor/<id>/<slug>`. Open a PR to `main`. **Do not merge.** Trevor merges feature branches. Do not `git stash` another agent’s files. Do not nest worktrees. If `git rev-parse --git-common-dir` differs from `--git-dir`, you are already in a worktree — stay there.
 
 ## Order
 
@@ -41,7 +41,7 @@ Parallel immediately: `trevor-sdk`, `trevor-infra`, `trevor-ci`.
 
 After SDK is importable: `trevor-demo`. After demo CLI exists: `trevor-scripts`.
 
-Do not copy files between worktrees. PR merge is the integrate step.
+Do not copy files between worktrees. Trevor merging the PR into `main` is the integrate step.
 
 ## Prompt to paste into a parallel agent
 
