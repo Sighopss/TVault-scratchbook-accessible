@@ -21,6 +21,8 @@ Read repo-root `PLAN.md` and this file before any edit. Then open **exactly one*
 
 If `PLAN.md` is missing, stop.
 
+If the remote is `Sighopss/TVault-scratchbook-accessible`, you are in the **scratchpad**. Do not create `sdk/`, `demo-app/`, `infra/`, or CI here. Product code goes in the separate repo named in `PLAN.md`.
+
 ## Product (do not invent another)
 
 One request = one **flight** = one `trace_id` with child spans (`llm`, `tool`, `rag`, `http`). Trevor **creates** those spans from a tiny Bedrock RAG/agent and ships them to AWS. Alexis **stores** only redacted payloads. Michael **renders** them in Next.js. Grafana is not the product. Langfuse is not the backend.
@@ -53,7 +55,7 @@ Claim a lease in `.agent-leases.json` (gitignored) before writing. One id, one p
 
 Human Trevor may hold infra+ci together. Subagents must not.
 
-Worktree: `.worktrees/<id>/` on branch `trevor/<id>/<slug>`. Do not nest worktrees. Do not share a dirty tree.
+Worktree: `.worktrees/<id>/` on branch `trevor/<id>/<slug>`. Open a PR. Do not merge — Trevor merges. Do not nest worktrees. Do not share a dirty tree.
 
 ## Stack (locked)
 

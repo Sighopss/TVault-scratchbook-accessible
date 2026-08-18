@@ -20,7 +20,7 @@ If the task is “fix the waterfall” or “add Presidio”: stop. That is not 
 /web/        @michael
 ```
 
-Schema PRs: all three. Trevor PRs: Trevor + one other reviewer.
+Schema PRs: all three. Trevor PRs: Trevor + one other reviewer. **Only Trevor merges any PR into `main`.**
 
 ## Collision rule
 

@@ -1,6 +1,6 @@
 # TVault scratchbook
 
-Plan, brand, and **Trevor-lane skills** so parallel LLMs (Cursor, Claude, Kiro) can code without colliding.
+**Scratchpad only.** This GitHub repo is not the product. Plan, brand, and Trevor-lane skills. Application code goes in a separate repo Trevor creates — see [PLAN.md](PLAN.md).
 
 ## Humans
 

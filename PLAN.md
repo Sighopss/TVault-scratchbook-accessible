@@ -5,7 +5,11 @@
 **Track:** Unified AI Observability  
 **Constraint:** Observability must not become a data-leakage mechanism.
 
-This is the shareable plan. Nothing is built yet. One repo, one span contract, three packages. If a task is not on the judge path, it does not get built.
+This is the shareable plan. Nothing is built yet. If a task is not on the judge path, it does not get built.
+
+**This GitHub repo is a scratchpad, not the product.** `https://github.com/Sighopss/TVault-scratchbook-accessible` holds plan, brand, and skills so humans and LLMs can read them. Officially we will **not** use it as the app repository. Do not implement, merge, or deploy `sdk/`, `demo-app/`, `vault/`, `web/`, `infra/`, or CI here.
+
+**Product repo (separate):** Trevor creates a new GitHub repository. That is the only place application code lives. One product repo, one span contract, three packages. Feature-branch rules below apply **there**, not here.
 
 ---
 
@@ -61,7 +65,7 @@ One Flight Recorder. Challenge ideas are **views**, not three extra products.
 
 ### Trevor — exact work
 
-1. Create GitHub repo, branch protection, `CODEOWNERS`, GitHub OIDC role into one AWS account.
+1. Create a **new** product GitHub repo (not this scratchpad). Branch protection on `main` (Trevor-only merge), `CODEOWNERS`, GitHub OIDC role into one AWS account. Copy `PLAN.md` + skills into it as read-only constitution; do not keep building the app in `TVault-scratchbook-accessible`.
 2. Empty CI that already fails on `gitleaks` and `trivy`.
 3. `sdk/tracevault/`: `start_span` / `end_span` wrapping Bedrock `converse` and one RAG retrieve. Emits OTel-shaped JSON (`trace_id`, `span_id`, `parent_id`, `tenant_id`, `kind`: `llm|tool|rag|http`, `gen_ai.request.model`, tokens, `cost_usd`). **Does not send raw prompts** if the caller marked them sensitive; still Alexis redacts at the door.
 4. `demo-app/`: 3–5 markdown docs in S3, embed, top-k retrieve, one tool call, one LLM answer. Two tenant API keys.
@@ -95,6 +99,8 @@ One Flight Recorder. Challenge ideas are **views**, not three extra products.
 ---
 
 ## Repo layout
+
+Target tree of the **product** repo (not this scratchpad):
 
 ```text
 TraceVault/
@@ -237,6 +243,22 @@ Flight = one trace. Span kinds: llm, tool, rag, http. Vault = ingest+redact+stor
 
 ---
 
+## Git: feature branches, Trevor merges
+
+**Scratchpad (`Sighopss/TVault-scratchbook-accessible`):** not the app. No product PRs, no deploys.
+
+**Product repo (the new GitHub repo Trevor creates):** this is mandatory for humans and for parallel LLMs.
+
+- **`main` is protected.** Nobody pushes commits onto `main`. Nobody merges to `main` except **Trevor**.
+- **All work lives on feature branches.** Alexis, Michael, Trevor, and every coding agent open a branch and a pull request. Agents must not `git merge` into `main`, must not `git push origin main`, and must not click Merge.
+- Branch names:
+  - Humans: `alexis/<slug>`, `michael/<slug>`, `trevor/<slug>`
+  - Trevor’s parallel agents: `trevor/<id>/<slug>` (`sdk`, `demo`, `scripts`, `infra`, `ci`)
+- PRs target `main`. CI must be green. Schema changes still need all three people to sign off in the PR thread. **Trevor is the only merger.**
+- Deploy runs only after Trevor merges to `main`. Feature branches never deploy.
+
+---
+
 ## CODEOWNERS
 
 ```
@@ -249,7 +271,7 @@ Flight = one trace. Span kinds: llm, tool, rag, http. Vault = ingest+redact+stor
 /web/        @michael
 ```
 
-PRs need the owning lane plus one other reviewer. Do not merge schema changes without all three.
+PRs need the owning lane plus one other reviewer. Do not merge schema changes without all three. **Only Trevor merges the PR into `main`.**
 
 ---
 
@@ -264,7 +286,7 @@ PRs need the owning lane plus one other reviewer. Do not merge schema changes wi
 | `infra/**` | `terraform plan` |
 | Merge to `main` | apply `dev`, then `prod` |
 
-No deploy from feature branches. No CodePipeline. No per-PR AWS stacks.
+No deploy from feature branches. No CodePipeline. No per-PR AWS stacks. No agent or teammate merge to `main` — Trevor only.
 
 ---
 
