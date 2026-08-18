@@ -1,11 +1,9 @@
-# Contracts (drafts)
+# Contracts
 
-This scratchpad is not the product repo. Hour 0: copy these into the product `contracts/` and lock with all three humans.
+Canonical HTTP + auth is **PLAN.md**. Hour 0 in the product repo:
 
-| File | Becomes | Steal |
-|---|---|---|
-| `http.draft.md` | `contracts/http.md` | HemoStat `API_PROTOCOL.md` — freeze HTTP before lane code |
-| Trevor `skills/trevor-recorder/span.schema.draft.json` | `contracts/span.schema.json` | same hour |
-| Hour 0 fixtures (full flights, not single spans) | `contracts/fixtures/tenant-a-rag.json`, `tenant-b-pii.json` | Michael Day 1 |
-
-Do not implement `sdk/`, `vault/`, or `web/` here.
+| Copy from | Becomes |
+|---|---|
+| PLAN.md section **HTTP + auth** (or this folder’s `http.draft.md` pointer) | `contracts/http.md` |
+| `skills/trevor-recorder/span.schema.draft.json` | `contracts/span.schema.json` |
+| Full flight fixtures (not single spans) | `contracts/fixtures/tenant-a-rag.json`, `tenant-b-pii.json` |
