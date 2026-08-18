@@ -1,12 +1,12 @@
 # Skills index
 
-Load **one lane**. Trevor is the only lane with a full skill.
+Load **one lane**. Copy Trevor’s folder shape. Do not run a lane off `PLAN.md` alone.
 
 | Lane | Owner | Load |
 |---|---|---|
 | Recorder + AWS | Trevor | [trevor-recorder/SKILL.md](trevor-recorder/SKILL.md) then one [agents/*.md](trevor-recorder/agents/) |
-| Vault | Alexis | `PLAN.md` only (no skill folder yet) |
-| Explorer | Michael | `PLAN.md` + Impeccable (no skill folder yet) |
+| Vault | Alexis | `skills/alexis-vault/` — **not written yet**. Clone `trevor-recorder/` (see PLAN.md “Skills constitution”). Until it exists, `PLAN.md` only. |
+| Explorer | Michael | `skills/michael-explorer/` — **not written yet**. Clone `trevor-recorder/` + Impeccable. Until it exists, `PLAN.md` + Impeccable only. |
 
 ## Trevor missions (parallel)
 

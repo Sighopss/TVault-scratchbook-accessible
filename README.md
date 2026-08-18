@@ -33,4 +33,4 @@ Draft span schema (until hour 0): [span.schema.draft.json](skills/trevor-recorde
 
 ## Not in this repo yet
 
-Alexis `vault/` skill and Michael `web/` skill. Until those exist, they use `PLAN.md` only.
+Alexis `skills/alexis-vault/` and Michael `skills/michael-explorer/`. PLAN.md tells them to clone `skills/trevor-recorder/` (same `.md` split, leases, worktrees, handoffs). Until those folders exist, they use `PLAN.md` only.

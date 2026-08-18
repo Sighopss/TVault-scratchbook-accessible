@@ -76,6 +76,7 @@ One Flight Recorder. Challenge ideas are **views**, not three extra products.
 
 ### Alexis — exact work
 
+0. **Before vault code:** write a skills constitution the same way Trevor did (`skills/trevor-recorder/`). See “Skills constitution” below. Do not run five agents against a single `PLAN.md` blob.
 1. `vault/ingest/`: HTTP API, Cognito/API-key auth, JSON Schema validate, enqueue.
 2. `vault/redact/`: Presidio + deny-list (SSN, email, AWS keys, `sk-` tokens). Prompt body → `prompt_hash` + `prompt_preview` (masked). **Fail closed:** if redaction errors, drop the payload, do not store raw.
 3. `vault/store/`: S3 SSE-KMS under `s3://…/{tenant_id}/{trace_id}/`. DynamoDB PK=`tenant_id`, SK=`trace_id`. IAM condition keys on tenant.
@@ -86,6 +87,7 @@ One Flight Recorder. Challenge ideas are **views**, not three extra products.
 
 ### Michael — exact work
 
+0. **Before Next.js:** write a skills constitution the same way Trevor did, then Impeccable (`PRODUCT.md`). Do not open `web/` until both exist.
 1. Before the weekend: Impeccable prep (section below). Do not open Next.js until `PRODUCT.md` exists.
 2. `web/`: Next.js App Router. Four screens: sign-in (Cognito hosted UI), flight list, flight waterfall, audit/tenant strip.
 3. Day 1 renders `contracts/fixtures/tenant-a-rag.json` with **no API**. Day 2 swaps the fetcher to Alexis’s read API.
@@ -95,6 +97,76 @@ One Flight Recorder. Challenge ideas are **views**, not three extra products.
 7. Tenant switcher. Direct ID fetch as the other user must show 403 in the UI.
 8. Thin RCA: if a span `status=error`, one panel lists the failing span + siblings. Optional one Bedrock call over **already-redacted** spans. Cut this first if time slips.
 9. Playwright: fixture A renders; fixture B shows masked preview not the SSN.
+
+---
+
+## Skills constitution (Alexis and Michael: copy Trevor)
+
+Trevor already did this. Alexis and Michael must do the **same shape**, not a one-file prompt. The point is to run several LLMs on one laptop without them colliding, and to hand work to each other as a team without anyone editing the wrong tree.
+
+**Do not invent a different layout.** Clone `skills/trevor-recorder/` and rename. Template is in this scratchpad; the live copy lives in the **product** repo.
+
+### File set (mandatory)
+
+Each lane is a folder of markdown, not a vibe:
+
+```text
+skills/<lane>/
+  SKILL.md              # constitution: product, write paths, never-write paths, agent ids
+  ownership.md          # CODEOWNERS + “if the task is X, stop”
+  parallel.md           # .agent-leases.json, worktrees, one id → one path
+  stack.md              # pinned runtime/libs for that lane only
+  enterprise.md         # security bar for that lane
+  handoffs.md           # FROM-<you>.md the other two paste into their agents
+  workflow.md           # load order, done checklist
+  agents/
+    <mission>.md        # exact files, APIs, tests, bans — one agent opens exactly one
+```
+
+Mirror `SKILL.md` into tool loaders so Cursor/Claude/Kiro pick it up: `.cursor/skills/<lane>/SKILL.md`, `.claude/skills/<lane>/SKILL.md`, `.kiro/skills/<lane>/SKILL.md`. Repo-root `AGENTS.md` gets a paste block per mission, same as Trevor.
+
+### Parallel on one computer
+
+Same protocol as `skills/trevor-recorder/parallel.md`:
+
+- One agent id, one mission file, one path set. Subagents do not “just do the whole vault.”
+- Lease paths in **repo-root** `.agent-leases.json` (shared across all three humans). If a lease overlaps, stop. Do not delete someone else’s lease.
+- Worktree per agent: `.worktrees/<id>/` on `alexis/<id>/<slug>` or `michael/<id>/<slug>`. Open a PR. **Do not merge — Trevor merges.**
+- Do not copy files between worktrees. Do not `git stash` another agent’s tree.
+
+### Parallel as a team
+
+- **Never write another lane.** Alexis never writes `sdk/`, `web/`, `infra/`. Michael never writes `vault/`, `sdk/`, `infra/`. Need something from the other person → `handoffs/FROM-<you>.md` and stop.
+- Handoff files are the API between humans. Paste them into the other person’s agent. Do not Slack a paragraph and hope.
+- Shared hour 0 (`contracts/`) is the only tree all three touch, and only together.
+
+### Suggested missions (split like Trevor’s `sdk|demo|scripts|infra|ci`)
+
+**Alexis — `skills/alexis-vault/`**
+
+| Agent id | Mission file | Writes |
+|---|---|---|
+| `alexis-ingest` | `agents/ingest.md` | `vault/ingest/` |
+| `alexis-redact` | `agents/redact.md` | `vault/redact/` |
+| `alexis-store` | `agents/store.md` | `vault/store/` |
+| `alexis-read` | `agents/read.md` | `vault/read/` |
+| `alexis-audit` | `agents/audit.md` | `vault/audit/` |
+
+Each mission names tests (SSN fail-closed, cross-tenant 403, 401). Redact owns fail-closed; store owns KMS paths; read owns JWT 403.
+
+**Michael — `skills/michael-explorer/`**
+
+| Agent id | Mission file | Writes |
+|---|---|---|
+| `michael-shell` | `agents/shell.md` | App Router, Cognito sign-in, layout, brand tokens |
+| `michael-list` | `agents/list.md` | Flight list from fixtures, then Alexis read API |
+| `michael-waterfall` | `agents/waterfall.md` | Span waterfall, tokens, `$` |
+| `michael-hops` | `agents/hops.md` | RAG hops + `REDACTED` badges + tenant 403 in UI |
+| `michael-e2e` | `agents/e2e.md` | Playwright: fixture A renders, fixture B hides SSN |
+
+Impeccable stays on Michael the human (`PRODUCT.md` / `DESIGN.md`). Subagents consume those files; they do not restyle.
+
+Update `skills/INDEX.md` when the folders exist. Until then, Alexis/Michael are flying blind and will collide.
 
 ---
 
@@ -123,9 +195,15 @@ TraceVault/
     demo_pii_flight.sh
   .github/workflows/
   Makefile
+  PLAN.md              # this file — team plan
   PRODUCT.md           # Impeccable — Michael, hour -1
   DESIGN.md            # Impeccable — after first UI surface
-  PLAN.md              # this file — team plan
+  AGENTS.md            # paste blocks for parallel agents
+  skills/
+    INDEX.md
+    trevor-recorder/   # template Alexis/Michael copy
+    alexis-vault/      # Alexis writes this constitution
+    michael-explorer/  # Michael writes this constitution
 ```
 
 Hour 0 (all three, 90 minutes): lock `span.schema.json` + both fixtures. No lane code before that file exists. This is HemoStat’s `API_PROTOCOL.md`.
@@ -133,6 +211,10 @@ Hour 0 (all three, 90 minutes): lock `span.schema.json` + both fixtures. No lane
 ---
 
 ## Preparation (do this before the clock starts)
+
+### All three — skills first, then coreutils
+
+Alexis and Michael: write the skills constitution **this week**, before vault/Next.js. Copy Trevor. If you skip it, parallel agents will overwrite each other and you will spend the hackathon merging conflicts instead of shipping the judge path.
 
 ### All three — coreutils and agent time
 
