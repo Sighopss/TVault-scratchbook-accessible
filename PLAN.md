@@ -268,7 +268,7 @@ Trevor and Alexis do not drive Impeccable. They consume `PRODUCT.md` so SDK fiel
 web
 
 ## Stack
-Next.js 15 App Router, TypeScript strict, Cognito hosted UI, fixture JSON until the read API exists.
+Next.js 15 App Router, `output: 'export'`, TypeScript strict, Cognito hosted UI, fixture JSON until `GET /v1/traces*` exists. Env: `NEXT_PUBLIC_API_URL` and Cognito `NEXT_PUBLIC_*`.
 
 ## Users
 On-call ML/SRE engineers reconstructing one failed or expensive AI request. They already know traces. They do not want a marketing site.
@@ -302,7 +302,8 @@ Flight = one trace. Span kinds: llm, tool, rag, http. Vault = ingest+redact+stor
 
 - AWS account + IAM user/role for Terraform + GitHub OIDC.
 - Bedrock model access enabled in the region (us-east-1 unless told otherwise).
-- Repo + `CODEOWNERS` + empty workflows.
+- Repo + `CODEOWNERS` + empty workflows including `vault.yml` / `web.yml`.
+- Terraform remote-state bucket + lock table (human, once).
 - Confirm Alexis and Michael have coreutils + WSL + Cursor Impeccable (Michael).
 
 ---
