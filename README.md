@@ -10,8 +10,9 @@ Open [PLAN.md](PLAN.md) for the three-person product plan.
 
 1. This file
 2. [AGENTS.md](AGENTS.md) — paste blocks for parallel agents
-3. [PLAN.md](PLAN.md) — product, fences, 48h clock
-4. [skills/INDEX.md](skills/INDEX.md) — which folder
+3. [PLAN.md](PLAN.md) — product, fences, 48h SaaS bar
+4. [contracts/http.draft.md](contracts/http.draft.md) — HTTP + auth (hour 0 lock)
+5. [skills/INDEX.md](skills/INDEX.md) — which folder
 5. [skills/trevor-recorder/SKILL.md](skills/trevor-recorder/SKILL.md) — constitution
 6. **One** mission under [skills/trevor-recorder/agents/](skills/trevor-recorder/agents/)
 
@@ -25,7 +26,8 @@ Open [PLAN.md](PLAN.md) for the three-person product plan.
 
 Each mission names exact files, APIs, tests, and bans. Do not open all five in one context.
 
-Draft span schema (until hour 0): [span.schema.draft.json](skills/trevor-recorder/span.schema.draft.json)
+Draft span schema (until hour 0): [span.schema.draft.json](skills/trevor-recorder/span.schema.draft.json)  
+HTTP contract (until hour 0): [contracts/http.draft.md](contracts/http.draft.md)
 
 ## Brand
 
@@ -33,4 +35,4 @@ Draft span schema (until hour 0): [span.schema.draft.json](skills/trevor-recorde
 
 ## Not in this repo yet
 
-Alexis and Michael lane folders. Same constitution **format** as Trevor (`skills/lane-constitution/`). They write their own `SKILL.md` and missions. Do not copy `trevor-recorder/` content. Until those folders exist, they use `PLAN.md` only.
+Alexis and Michael lane folders. Same constitution **format** as Trevor (`skills/lane-constitution/`). They write their own `SKILL.md` and missions. Do not copy `trevor-recorder/` content. Until those folders exist, they use `PLAN.md` + `contracts/http.draft.md` only.

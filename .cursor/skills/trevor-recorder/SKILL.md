@@ -33,7 +33,7 @@ Judge trigger Trevor owes: `scripts/demo_pii_flight.sh` runs a demo whose user p
 
 **Write:** `sdk/`, `demo-app/`, `infra/`, `scripts/`, `.github/`, `Makefile`
 
-**Read-only after hour 0:** `contracts/` (schema + fixtures). Hour 0 is the three humans. Until `contracts/span.schema.json` exists, implement against `skills/trevor-recorder/span.schema.draft.json` and copy it into `contracts/` only if the human said hour 0 is done.
+**Read-only after hour 0:** `contracts/` (schema + `http.md` + fixtures). Hour 0 is the three humans. Until `contracts/span.schema.json` exists, implement against `skills/trevor-recorder/span.schema.draft.json`. Until `contracts/http.md` exists, implement against `contracts/http.draft.md`. Copy into `contracts/` only if the human said hour 0 is done.
 
 **Never write:** `vault/` (Alexis), `web/` (Michael), `PRODUCT.md`, `DESIGN.md`, `assets/`
 

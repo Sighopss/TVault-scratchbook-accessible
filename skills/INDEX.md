@@ -1,6 +1,6 @@
 # Skills index
 
-Load **one lane**. Format is `lane-constitution/` for everyone. Content is per owner. Do not run a lane off `PLAN.md` alone.
+Load **one lane**. Format is `lane-constitution/` for everyone. Content is per owner. HTTP is [contracts/http.draft.md](../contracts/http.draft.md) for all three — do not invent routes.
 
 | Lane | Owner | Load |
 |---|---|---|

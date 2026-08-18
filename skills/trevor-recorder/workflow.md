@@ -14,7 +14,7 @@
 - [ ] SDK golden + nesting + no-raw-log tests
 - [ ] Demo fake-bedrock span graph test
 - [ ] `scripts/demo_pii_flight.sh`
-- [ ] Terraform validate; plan has Cognito, KMS, WAF, TTL, OIDC
-- [ ] gitleaks + trivy workflows
+- [ ] Terraform validate; plan has Cognito `custom:tenant_id`, two Lambdas, CORS, `/health`, KMS, WAF, TTL, OIDC, alarm
+- [ ] gitleaks + trivy + vault.yml + web.yml + deploy sync
 - [ ] Zero files under `vault/` or `web/` from Trevor
 - [ ] Human-approved apply then URL kept alive

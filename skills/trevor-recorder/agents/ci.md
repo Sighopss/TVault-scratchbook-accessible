@@ -3,7 +3,9 @@
 **Id:** `trevor-ci`  
 **Write:** `.github/` and `Makefile` only
 
-You own CI checks that block a merge. You do not merge. Trevor merges feature branches into `main`.
+You own CI that blocks a merge and deploys the SaaS from `main`. You do not merge. Trevor merges feature branches into `main`.
+
+Minions deployed the workload under test. We deploy **platform + demo-app tests + web** from `main`, not Grafana.
 
 ## Files to create
 
@@ -13,15 +15,17 @@ Makefile
 .github/workflows/gitleaks.yml
 .github/workflows/trivy.yml
 .github/workflows/sdk.yml
+.github/workflows/vault.yml
+.github/workflows/web.yml
 .github/workflows/infra.yml
 .github/workflows/deploy.yml
 ```
 
 ## Makefile (Unix)
 
-Targets: `test` (sdk pytest), `demo` (calls `scripts/demo_pii_flight.sh` if present else echo skip), `plan` (`cd infra && terraform plan` if infra exists), `fmt`.
+Targets: `test` (sdk pytest if `sdk/` exists), `vault` (pytest in `vault/` if exists), `web` (echo skip until `web/` exists), `demo` (`scripts/demo_pii_flight.sh` or skip), `plan` (`terraform plan` if `infra/` exists), `fmt`, `redact-check` (alias of `vault`).
 
-No PowerShell. No `make windows-*`.
+Jobs skip cleanly if the directory is missing (greenfield). No PowerShell. No `make windows-*`.
 
 ## CODEOWNERS
 
@@ -33,20 +37,26 @@ Copy the block from [ownership.md](../ownership.md).
 
 **trivy.yml** — `trivy fs .` every PR.
 
-**sdk.yml** — on `sdk/**` and `contracts/**`: Python 3.12, `uv sync`, `pytest`. `bandit -r sdk/src`.
+**sdk.yml** — `sdk/**` `demo-app/**` `contracts/**`: Python 3.12, `uv`, `pytest`, `bandit -r sdk`.
 
-**infra.yml** — on `infra/**`: terraform fmt, init -backend=false, validate. Plan only if `AWS_ROLE_ARN` secret exists (OIDC).
+**vault.yml** — `vault/**` `contracts/**`: Python 3.12, `pytest`, `bandit -r vault`. Skip if `vault/` missing.
 
-**deploy.yml** — **push to `main` only**. OIDC to AWS. `terraform apply` for `dev` then optional `prod` with environment protection. Never deploy from feature branches. Never store AKIA.
+**web.yml** — `web/**`: Node 22, `pnpm lint`, Playwright vs fixtures. Skip if `web/` missing.
 
-Pin action SHAs if you know them; otherwise pin major tags and leave a TODO to SHA-pin.
+**infra.yml** — `infra/**`: terraform fmt, init (backend if configured, else `-backend=false`), validate. Plan if `AWS_ROLE_ARN` present.
+
+**deploy.yml** — **push to `main` only**. OIDC. `terraform apply` `dev`, then `prod` with GitHub Environment protection. If `web/` exists: `pnpm build` + `aws s3 sync` + CloudFront invalidation. Never AKIA. Rollback = re-run this workflow on the previous successful commit (document in Makefile help).
+
+Pin action SHAs if known; else major tags + TODO to SHA-pin.
+
+Human checklist (README in Makefile help, do not automate unless asked): `main` protected, required checks, Trevor-only merge.
 
 ## Do not
 
-Add CodePipeline. Add per-PR AWS stacks. Skip gitleaks. Edit application code.
+CodePipeline. Per-PR AWS stacks. Skip gitleaks. Edit application code. Deploy from feature branches.
 
 ## Done
 
-- [ ] Empty workflows still run on a greenfield tree (jobs skip gracefully if dir missing)
-- [ ] README section in Makefile help
+- [ ] Empty tree: missing dirs skip, gitleaks/trivy still run
+- [ ] `vault.yml` and `web.yml` exist (PLAN requires them)
 - [ ] Lease released
