@@ -1,25 +1,12 @@
 # Handoffs
 
-You do not implement another lane. You leave them a file they can drop into their agent.
+You do not implement another lane. You leave a **per-PR file** the other LLM can load.
 
-Write `handoffs/FROM-<your-name>-<id>.md`. Template:
+Team protocol (collision + pickup): repo [`handoffs/README.md`](../../handoffs/README.md). Template: [`handoffs/PR.example.md`](../../handoffs/PR.example.md).
 
-```markdown
-# Handoff from <your-name>-<id>
-Date:
-Blocked on: <other-human> | Human
+Every PR commits `handoffs/<your-name>-<id>-<slug>.md` and pastes it into the PR body. Not gitignored. Not chat-only.
 
-## What I shipped
-- paths:
-- outputs / env vars:
-
-## What I need
-- from whom:
-- contract / URL / header / path:
-
-## Contract reminder
-<only the interface you own — not another lane’s internals>
-```
+Write the file **on your feature branch** before or with the code. If you need another lane changed: fill the handoff, stop. Do not implement their tree.
 
 ## Direction table
 

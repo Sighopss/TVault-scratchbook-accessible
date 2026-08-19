@@ -56,7 +56,7 @@ Work through `SKILL.md`, then `ownership.md`, `parallel.md`, `stack.md`, `enterp
 
 **enterprise.md:** **your** fail-closed path (Alexis: redaction + 403. Michael: no raw PII on screen, contracted 403 UI).
 
-**handoffs.md:** fill the direction table for **your** I/O only.
+**handoffs.md:** fill the direction table for **your** I/O only. Per-PR files live in repo `handoffs/` — protocol in `handoffs/README.md`, not chat.
 
 **workflow.md:** Start protocol = this file until constitution is filled, then one mission at a time. Done-list = acceptance from **your** PLAN bullets, not Trevor’s.
 
@@ -102,9 +102,10 @@ Do not implement application code in the same first pass unless the human said t
 
 Every session:
 
-1. `START.md` → `PLAN.md` → your `SKILL.md` → one mission (or this fill file if still incomplete).
+1. `START.md` → `PLAN.md` → `handoffs/README.md` → `gh pr list --state open` (stop if claimed paths overlap) → your `SKILL.md` → one mission (or this fill file if still incomplete).
 2. Do the work.
 3. **Write back** into the constitution: tick workflow, append `progress.md`, add learned env/paths to `stack.md`.
+4. Commit `handoffs/<your-name>-<id>-<slug>.md` on the PR (copy `handoffs/PR.example.md`). Paste it in the PR body.
 
 That is the loop. Chat is not the system of record.
 
@@ -115,3 +116,4 @@ That is the loop. Chat is not the system of record.
 - Invent routes not in HTTP + auth.
 - Merge to `main` (Trevor merges). Commit only if the human asked.
 - Start long-running servers. Put secrets in git.
+- Skip `gh pr list` / skip the per-PR `handoffs/*.md` file.

@@ -3,10 +3,10 @@
 1. Read `PLAN.md`.
 2. Read `skills/trevor-recorder/SKILL.md`.
 3. Read **one** `agents/*.md` matching your id.
-4. Lease paths. Stop on overlap.
-5. Implement only those paths. Tests first on SDK.
+4. Lease paths **and** open PRs (`handoffs/README.md`). Stop on overlap.
+5. Implement only those paths. Tests first on SDK. Write `handoffs/trevor-<id>-<slug>.md` on this branch.
 6. No `terraform apply`, no servers, no commit unless the human asked.
-7. Handoff note if blocked.
+7. PR body = that handoff. Do not merge — Trevor merges.
 8. Release lease.
 
 ## Done (lane)

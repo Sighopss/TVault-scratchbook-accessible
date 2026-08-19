@@ -8,8 +8,9 @@ Do not invent a second product. Grafana is not the UI. **Only Trevor merges** to
 
 1. This file
 2. `PLAN.md` — product, judge path, HTTP + auth, **the named section for this human**
-3. `contracts/http.draft.md` until `contracts/http.md` exists
-4. `skills/INDEX.md`
+3. `handoffs/README.md` — per-PR handoff + collision. Then `gh pr list --state open` before any write.
+4. `contracts/http.draft.md` until `contracts/http.md` exists
+5. `skills/INDEX.md`
 
 Then branch on who they are.
 
@@ -34,7 +35,7 @@ If they did not say, ask: **Trevor / Alexis / Michael**.
 
 **Product repo:** still no lane code until hour 0 locks contracts. Michael: no `web/` until `PRODUCT.md` exists.
 
-When the constitution is already filled, skip FILL; execute the next mission in **their** `workflow.md` and write back into `progress.md`.
+When the constitution is already filled, skip FILL; execute the next mission in **their** `workflow.md`, collision-check open PRs, write `handoffs/<name>-<id>-<slug>.md` on that PR, append `progress.md`.
 
 ## Trevor
 
@@ -51,6 +52,7 @@ I am Alexis. Ok let's start.
 Read START.md and skills/FILL-CONSTITUTION.md.
 Copy skills/lane-constitution/ into my lane folder and fill it from PLAN.md (my section + HTTP + auth).
 Do not copy skills/trevor-recorder/. Do not implement vault/ in the scratchpad.
+Before any later write: gh pr list --state open and handoffs/README.md. One handoff file per PR.
 Update my progress.md before you stop. Do not merge to main — Trevor merges.
 ```
 
@@ -61,6 +63,7 @@ I am Michael. Ok let's start.
 Read START.md and skills/FILL-CONSTITUTION.md.
 Copy skills/lane-constitution/ into my lane folder and fill it from PLAN.md (my section + HTTP + Look).
 Do not copy skills/trevor-recorder/. Do not implement web/ in the scratchpad.
+Before any later write: gh pr list --state open and handoffs/README.md. One handoff file per PR.
 Update my progress.md before you stop. Do not merge to main — Trevor merges.
 ```
 
@@ -68,7 +71,9 @@ Update my progress.md before you stop. Do not merge to main — Trevor merges.
 
 ```
 I am Trevor. Ok let's start.
-Read START.md, PLAN.md, then skills/trevor-recorder/SKILL.md and one agents/*.md.
+Read START.md, PLAN.md, handoffs/README.md, then skills/trevor-recorder/SKILL.md and one agents/*.md.
+gh pr list --state open. If claimed paths overlap yours, stop.
+Commit handoffs/<id>-<slug>.md on the PR (copy handoffs/PR.example.md).
 Do not fill Alexis or Michael constitutions. Do not edit vault/ or web/.
 Do not merge to main — Trevor merges feature branches.
 ```

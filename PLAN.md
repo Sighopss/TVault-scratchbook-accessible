@@ -18,6 +18,7 @@ This file is the team plan. Everything below is in here on purpose.
 | Start | Pull → “ok let’s start”: `START.md` (Alexis/Michael fill their own skills) |
 | Tree | Product repo layout |
 | Git / CI | Branches, Trevor merges, checks |
+| Handoffs | One committed file per PR; claimed paths = collision |
 | Prep | Before the clock |
 | 48h table | Hour-by-hour |
 | Look | Explorer target (not Grafana) |
@@ -229,20 +230,23 @@ skills/<your-lane>/
 
 Mirror `SKILL.md` to `.cursor/skills/<your-lane>/`, `.claude/skills/<your-lane>/`, `.kiro/skills/<your-lane>/`. Add paste blocks to `AGENTS.md`. Register in `skills/INDEX.md`.
 
-**Parallel (do not rewrite):**
+**Parallel (do not rewrite lease/worktree rules):**
 
 - One agent id, one mission file, one path set.
-- Lease in repo-root `.agent-leases.json` (all lanes share it). Overlap + started < 4h ago → stop. Do not delete someone else’s lease.
+- Lease in repo-root `.agent-leases.json` (all lanes share it, gitignored). Overlap + started < 4h ago → stop. Do not delete someone else’s lease.
+- **Per PR:** commit `handoffs/<name>-<id>-<slug>.md` (see [`handoffs/README.md`](handoffs/README.md)). Paste it in the PR body. Before write: `gh pr list` — overlapping **Claimed paths** → stop. Local leases do not see other laptops.
 - `git worktree add .worktrees/<name>-<id> -b <name>/<id>/<slug>`
 - Open a PR. **Do not merge — Trevor merges.**
-- Need another lane → `handoffs/FROM-<you>.md` and stop.
+- Need another lane → that handoff file on the PR, then stop.
 
 Paste:
 
 ```
 You are <your-name>-<id>.
-Read PLAN.md and skills/<your-lane>/SKILL.md.
+Read PLAN.md, handoffs/README.md, and skills/<your-lane>/SKILL.md.
+gh pr list --state open. If claimed paths overlap yours, stop.
 Execute skills/<your-lane>/agents/<id>.md only.
+Commit handoffs/<your-name>-<id>-<slug>.md on this PR.
 Do not commit unless I ask. Do not merge to main — Trevor merges.
 Do not edit paths PLAN.md assigns to someone else.
 ```
@@ -266,7 +270,8 @@ infra/               # Trevor
 scripts/demo_pii_flight.sh
 .github/workflows/
 Makefile
-PLAN.md  PRODUCT.md  DESIGN.md  AGENTS.md
+PLAN.md  PRODUCT.md  DESIGN.md  AGENTS.md  START.md
+handoffs/README.md  handoffs/PR.example.md  handoffs/<name>-<id>-<slug>.md   # one file per PR
 skills/INDEX.md
 skills/lane-constitution/
 skills/trevor-recorder/
@@ -279,6 +284,8 @@ skills/<michael-lane>/
 ## Git / CI
 
 `main` protected. Feature branch + PR. Humans: `alexis/<slug>`, `michael/<slug>`, `trevor/<slug>`. Trevor agents: `trevor/<id>/<slug>`. **Only Trevor merges.** Schema/`http.md` PRs: all three in the thread. No push to `main`. No deploy from feature branches. No CodePipeline. No per-PR stacks.
+
+Every PR: committed `handoffs/<name>-<id>-<slug>.md` + same text in the PR body ([`.github/pull_request_template.md`](.github/pull_request_template.md)). Collision = claimed-path overlap with an **open** PR, or local lease overlap.
 
 ```
 /contracts/  @trevor @alexis @michael

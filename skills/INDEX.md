@@ -2,7 +2,7 @@
 
 Load **one lane**. Format is `lane-constitution/` for everyone. Content is per owner. HTTP is [contracts/http.draft.md](../contracts/http.draft.md) for all three — do not invent routes.
 
-First clone / “ok let’s start”: [START.md](../START.md). Alexis and Michael **fill their own** folders via [FILL-CONSTITUTION.md](FILL-CONSTITUTION.md). Do not copy [trevor-recorder/](trevor-recorder/).
+First clone / “ok let’s start”: [START.md](../START.md). Parallel PRs: [handoffs/README.md](../handoffs/README.md) (one file per PR, claimed paths). Alexis and Michael **fill their own** folders via [FILL-CONSTITUTION.md](FILL-CONSTITUTION.md). Do not copy [trevor-recorder/](trevor-recorder/).
 
 | Lane | Owner | Load |
 |---|---|---|

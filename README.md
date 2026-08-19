@@ -12,10 +12,11 @@ Open [PLAN.md](PLAN.md) for the three-person product plan.
 
 1. This file
 2. [START.md](START.md) — “ok let’s start”
-3. [AGENTS.md](AGENTS.md) — paste blocks once a lane exists
-4. [PLAN.md](PLAN.md) — product, fences, 48h SaaS bar
-5. [contracts/http.draft.md](contracts/http.draft.md) — HTTP + auth (hour 0 lock)
-6. [skills/INDEX.md](skills/INDEX.md)
+3. [handoffs/README.md](handoffs/README.md) — one handoff file per PR; `gh pr list` before write
+4. [AGENTS.md](AGENTS.md) — paste blocks once a lane exists
+5. [PLAN.md](PLAN.md) — product, fences, 48h SaaS bar
+6. [contracts/http.draft.md](contracts/http.draft.md) — HTTP + auth (hour 0 lock)
+7. [skills/INDEX.md](skills/INDEX.md)
 
 **Trevor:** [skills/trevor-recorder/SKILL.md](skills/trevor-recorder/SKILL.md) then **one** mission under [skills/trevor-recorder/agents/](skills/trevor-recorder/agents/).
 
