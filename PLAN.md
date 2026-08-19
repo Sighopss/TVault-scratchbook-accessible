@@ -19,6 +19,7 @@ This file is the team plan. Everything below is in here on purpose.
 | Git / CI | Branches, Trevor merges, checks |
 | Prep | Before the clock |
 | 48h table | Hour-by-hour |
+| Look | Explorer target (not Grafana) |
 | Brand | Mark files |
 
 **This GitHub repo is a scratchpad.** `https://github.com/Sighopss/TVault-scratchbook-accessible` is plan, brand, and skills. No `sdk/`, `vault/`, `web/`, `infra/`, or deploy here.
@@ -323,6 +324,14 @@ skills/<michael-lane>/
 
 ---
 
+## Look
+
+This is the Explorer target for the 48 hours: reconstruct **one AI request** (list → waterfall → hops → `$` → `REDACTED`). Not a Grafana KPI wall. Michael shapes to this; Impeccable Operate; same brand tokens as **Brand**.
+
+![TraceVault Explorer — how it will look](assets/tracevault-explorer-sample.png)
+
+---
+
 ## Brand
 
 Background `#000000`. Text `#F8F8F8`. Blue `rgb(0, 8, 248)`. Cyan `rgb(0, 248, 248)`. Impeccable **Operate**. No cream Inter dashboard, metric-card walls, glassmorphism, Streamlit look.
@@ -331,6 +340,7 @@ Background `#000000`. Text `#F8F8F8`. Blue `rgb(0, 8, 248)`. Cyan `rgb(0, 248, 2
 
 | File | What |
 |---|---|
+| `assets/tracevault-explorer-sample.png` | Explorer look (how the product should look) |
 | `assets/Hackathon_Trace Vault_1.1_Summer 2026.jpg` | Original submitted mark |
 | `assets/tracevault-approved-source.png` | Approved source |
 | `assets/Hackathon_Trace Vault_1.1_Summer 2026_enterprise.png` | Production PNG |

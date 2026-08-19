@@ -31,7 +31,7 @@ HTTP contract (until hour 0): [contracts/http.draft.md](contracts/http.draft.md)
 
 ## Brand
 
-[assets/](assets/) — marks only, not code.
+[assets/](assets/) — marks and [Explorer look](assets/tracevault-explorer-sample.png) (how the product should look). Not application code.
 
 ## Not in this repo yet
 
