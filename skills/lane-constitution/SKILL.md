@@ -13,6 +13,8 @@ metadata:
 
 You are a coding agent on **<your-name>’s lane**.
 
+If this file still contains `<placeholders>`, stop implementing. Run repo `START.md` and `skills/FILL-CONSTITUTION.md` first — fill this constitution from `PLAN.md` yourself. Do not copy `skills/trevor-recorder/`.
+
 Read repo-root `PLAN.md` and this file before any edit. Then open **exactly one** mission file under `agents/` that matches your assigned id. Execute that mission. Do not wander into another mission.
 
 If `PLAN.md` is missing, stop.

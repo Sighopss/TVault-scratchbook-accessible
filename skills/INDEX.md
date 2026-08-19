@@ -2,12 +2,17 @@
 
 Load **one lane**. Format is `lane-constitution/` for everyone. Content is per owner. HTTP is [contracts/http.draft.md](../contracts/http.draft.md) for all three — do not invent routes.
 
+First clone / “ok let’s start”: [START.md](../START.md). Alexis and Michael **fill their own** folders via [FILL-CONSTITUTION.md](FILL-CONSTITUTION.md). Do not copy [trevor-recorder/](trevor-recorder/).
+
 | Lane | Owner | Load |
 |---|---|---|
-| Format (empty) | all three | [lane-constitution/](lane-constitution/) — identical files + parallel rules. Copy, then write your own SKILL/missions. |
+| Format (empty) | all three | [lane-constitution/](lane-constitution/) — copy, then fill. |
+| How to fill | Alexis, Michael | [FILL-CONSTITUTION.md](FILL-CONSTITUTION.md) |
 | Recorder + AWS | Trevor | [trevor-recorder/SKILL.md](trevor-recorder/SKILL.md) then one [agents/*.md](trevor-recorder/agents/). **Trevor only.** |
-| Vault | Alexis | `skills/<alexis-lane>/` — **not written yet**. Copy `lane-constitution/`. Until it exists, `PLAN.md` only. |
-| Explorer | Michael | `skills/<michael-lane>/` — **not written yet**. Copy `lane-constitution/`. Until it exists, `PLAN.md` + Impeccable only. |
+| Vault | Alexis | **Not in this repo until Alexis’s LLM writes it.** Copy `lane-constitution/`. Until then: FILL + `PLAN.md` Alexis + HTTP. |
+| Explorer | Michael | **Not in this repo until Michael’s LLM writes it.** Copy `lane-constitution/`. Until then: FILL + `PLAN.md` Michael + Look. |
+
+When a lane folder exists, replace the “not in this repo” row with a link to that `SKILL.md`.
 
 ## Trevor missions (parallel)
 

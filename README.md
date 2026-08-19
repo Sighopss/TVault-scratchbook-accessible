@@ -1,20 +1,25 @@
 # TVault scratchbook
 
-**Scratchpad only.** This GitHub repo is not the product. Plan, brand, and Trevor-lane skills. Application code goes in a separate repo Trevor creates — see [PLAN.md](PLAN.md).
+**Scratchpad only.** This GitHub repo is not the product. Plan, brand, skills **format**, and Trevor’s filled lane. Application code goes in a separate repo Trevor creates — see [PLAN.md](PLAN.md).
 
 ## Humans
 
 Open [PLAN.md](PLAN.md) for the three-person product plan.
 
+**Alexis / Michael:** paste the block in [START.md](START.md). Your LLM fills **your** constitution from PLAN. Trevor does not write it.
+
 ## LLMs — load in this order
 
 1. This file
-2. [AGENTS.md](AGENTS.md) — paste blocks for parallel agents
-3. [PLAN.md](PLAN.md) — product, fences, 48h SaaS bar
-4. [contracts/http.draft.md](contracts/http.draft.md) — HTTP + auth (hour 0 lock)
-5. [skills/INDEX.md](skills/INDEX.md) — which folder
-5. [skills/trevor-recorder/SKILL.md](skills/trevor-recorder/SKILL.md) — constitution
-6. **One** mission under [skills/trevor-recorder/agents/](skills/trevor-recorder/agents/)
+2. [START.md](START.md) — “ok let’s start”
+3. [AGENTS.md](AGENTS.md) — paste blocks once a lane exists
+4. [PLAN.md](PLAN.md) — product, fences, 48h SaaS bar
+5. [contracts/http.draft.md](contracts/http.draft.md) — HTTP + auth (hour 0 lock)
+6. [skills/INDEX.md](skills/INDEX.md)
+
+**Trevor:** [skills/trevor-recorder/SKILL.md](skills/trevor-recorder/SKILL.md) then **one** mission under [skills/trevor-recorder/agents/](skills/trevor-recorder/agents/).
+
+**Alexis / Michael:** [skills/FILL-CONSTITUTION.md](skills/FILL-CONSTITUTION.md) until your folder is filled. Copy [skills/lane-constitution/](skills/lane-constitution/). Do not copy `trevor-recorder/` content.
 
 | Agent id | Mission | Writes |
 |---|---|---|
@@ -24,7 +29,7 @@ Open [PLAN.md](PLAN.md) for the three-person product plan.
 | `trevor-infra` | [agents/infra.md](skills/trevor-recorder/agents/infra.md) | `infra/` |
 | `trevor-ci` | [agents/ci.md](skills/trevor-recorder/agents/ci.md) | `.github/`, `Makefile` |
 
-Each mission names exact files, APIs, tests, and bans. Do not open all five in one context.
+Each Trevor mission names exact files, APIs, tests, and bans. Do not open all five in one context. Alexis/Michael missions live in **their** folders after they fill them.
 
 Draft span schema (until hour 0): [span.schema.draft.json](skills/trevor-recorder/span.schema.draft.json)  
 HTTP contract (until hour 0): [contracts/http.draft.md](contracts/http.draft.md)
@@ -32,7 +37,3 @@ HTTP contract (until hour 0): [contracts/http.draft.md](contracts/http.draft.md)
 ## Brand
 
 [assets/](assets/) — marks and [Explorer look](assets/tracevault-explorer-sample.png) (how the product should look). Not application code.
-
-## Not in this repo yet
-
-Alexis and Michael lane folders. Same constitution **format** as Trevor (`skills/lane-constitution/`). They write their own `SKILL.md` and missions. Do not copy `trevor-recorder/` content. Until those folders exist, they use `PLAN.md` + `contracts/http.draft.md` only.

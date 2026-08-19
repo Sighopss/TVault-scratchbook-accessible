@@ -15,6 +15,7 @@ This file is the team plan. Everything below is in here on purpose.
 | Three-person work | Who builds what |
 | HTTP + auth | Routes, JWT, CORS, two Lambdas |
 | Skills format | Parallel agents, same files, your content |
+| Start | Pull → “ok let’s start”: `START.md` (Alexis/Michael fill their own skills) |
 | Tree | Product repo layout |
 | Git / CI | Branches, Trevor merges, checks |
 | Prep | Before the clock |
@@ -22,7 +23,7 @@ This file is the team plan. Everything below is in here on purpose.
 | Look | Explorer target (not Grafana) |
 | Brand | Mark files |
 
-**This GitHub repo is a scratchpad.** `https://github.com/Sighopss/TVault-scratchbook-accessible` is plan, brand, and skills. No `sdk/`, `vault/`, `web/`, `infra/`, or deploy here.
+**This GitHub repo is a scratchpad.** `https://github.com/Sighopss/TVault-scratchbook-accessible` is plan, brand, and skills. No `sdk/`, `vault/`, `web/`, `infra/`, or deploy here. After clone, humans tell their LLM “ok let’s start” — [`START.md`](START.md). Alexis and Michael **fill their own** constitutions ([`skills/FILL-CONSTITUTION.md`](skills/FILL-CONSTITUTION.md)); Trevor does not write those folders.
 
 **Product repo:** Trevor creates a new GitHub repo. That is the only app. Copy this plan + skills into it. Git/CI rules apply **there**.
 
@@ -109,7 +110,7 @@ Shared, hour 0 only, all three: `contracts/`. After that, that tree needs all th
 
 ### Alexis
 
-0. Copy `skills/lane-constitution/` → `skills/<your-lane>/`. Write **your** `SKILL.md` and missions. Do not copy `trevor-recorder/`.
+0. Your LLM fills **your** constitution. “Ok let’s start” → [`START.md`](START.md) + [`skills/FILL-CONSTITUTION.md`](skills/FILL-CONSTITUTION.md). Copy `skills/lane-constitution/` → `skills/<your-lane>/`. Write **your** `SKILL.md` and missions from **this section** + HTTP + auth. Keep writing into `progress.md` as you go. Trevor does **not** write this folder. Do not copy `trevor-recorder/`.
 1. `vault/ingest|redact|store|read|audit/` plus `vault/handlers/ingest.py` and `read.py` (the two entrypoints Trevor zips).
 2. Implement **HTTP + auth** below exactly.
 3. Presidio + deny-list (SSN, email, AWS keys, `sk-`). Prompt → `prompt_hash` + masked `prompt_preview`. Persist Trevor’s `cost_usd` / tokens; do not invent them. S3 `…/{tenant_id}/{trace_id}/`. Dynamo PK `tenant_id` SK `trace_id`.
@@ -117,7 +118,7 @@ Shared, hour 0 only, all three: `contracts/`. After that, that tree needs all th
 
 ### Michael
 
-0. Same constitution copy. Then Impeccable: `/impeccable init` → `PRODUCT.md` (Operate), hooks on, `/impeccable shape` the four screens **before** components. Draft at the end of this section. Do not open `web/` until `PRODUCT.md` exists.
+0. Same as Alexis: your LLM fills **your** constitution (`START.md` + `skills/FILL-CONSTITUTION.md`). Then Impeccable: `/impeccable init` → `PRODUCT.md` (Operate), hooks on, `/impeccable shape` the four screens **before** components. Draft at the end of this section. Do not open `web/` until `PRODUCT.md` exists. Trevor does **not** write your skills.
 1. Next.js 15, `output: 'export'`. Screens: Cognito hosted UI, flight list, waterfall, audit/tenant strip. Detail via `?trace_id=` (no dynamic `[id]`).
 2. Day 1: `contracts/fixtures/tenant-a-rag.json` only. Day 2: fetcher → `GET /v1/traces*` below. Env from Trevor outputs: `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_COGNITO_*`. No hardcoded URLs.
 3. Waterfall (parent-child, latency, tokens, `$`), RAG hops (masked query, doc ids, scores), badges `REDACTED` / tenant / TTL, tenant switcher, 403 from contracted error JSON.
@@ -211,7 +212,7 @@ Tokens in memory or sessionStorage. Trevor outputs these values. Michael does no
 
 Same **format** for all three. Different **content**. That is what enforces parallel LLMs and three-person handoffs.
 
-Copy [`skills/lane-constitution/`](skills/lane-constitution/) to `skills/<your-lane>/`. Keep every filename. Fill placeholders. Write **your** `SKILL.md` and `agents/<mission>.md`. Do **not** clone [`skills/trevor-recorder/`](skills/trevor-recorder/) (Trevor’s missions, paths, APIs).
+Alexis and Michael fill their own folders. Procedure: [`START.md`](START.md) + [`skills/FILL-CONSTITUTION.md`](skills/FILL-CONSTITUTION.md). Copy [`skills/lane-constitution/`](skills/lane-constitution/) to `skills/<your-lane>/`. Keep every filename. Fill placeholders from **your** PLAN section. Write **your** `SKILL.md` and `agents/<mission>.md`. After each session, append `progress.md`. Do **not** clone [`skills/trevor-recorder/`](skills/trevor-recorder/) (Trevor’s missions, paths, APIs). Trevor does not author those two folders.
 
 ```text
 skills/<your-lane>/
@@ -222,6 +223,7 @@ skills/<your-lane>/
   enterprise.md
   handoffs.md
   workflow.md
+  progress.md
   agents/<mission>.md
 ```
 
@@ -302,9 +304,9 @@ skills/<michael-lane>/
 
 **Trevor:** AWS account + OIDC role. Bedrock enabled `us-east-1`. Product repo + protection + empty CI. Remote-state bucket + lock table. Confirm Alexis/Michael have coreutils, WSL, Impeccable (Michael).
 
-**Alexis:** Least-privilege AWS (not root in Cursor). Presidio hello-world (SSN, email, AWS key). Deny-list on paper. Skill folder filled. HTTP + auth section read.
+**Alexis:** Least-privilege AWS (not root in Cursor). Presidio hello-world (SSN, email, AWS key). Deny-list on paper. Skill folder filled **by your LLM** (`FILL-CONSTITUTION.md`). HTTP + auth section read.
 
-**Michael:** Impeccable skill loaded. `PRODUCT.md` written. Skill folder filled.
+**Michael:** Impeccable skill loaded. Skill folder filled **by your LLM**. `PRODUCT.md` written (product repo).
 
 **Hour 0 (90 min, together):** lock `span.schema.json` + `http.md` (copy HTTP + auth) + both **full flight** fixtures. No lane code before that.
 
