@@ -10,6 +10,7 @@ This file is the team plan. Everything below is in here on purpose.
 |---|---|
 | Done-bar | 48h production SaaS yes/no |
 | Judge path | What judges click |
+| How the software works | Runtime, locked |
 | Winners steal | What we copy from last year |
 | Stack | Languages, AWS, brand tokens |
 | Three-person work | Who builds what |
@@ -46,6 +47,66 @@ Kill if time slips: RCA → extra cost charts (keep one `$`) → extra span kind
 3. Sign in as **tenant-b**. Same `trace_id` → **403**. List does not include tenant-a.
 4. Audit row: who opened the trace, when. TTL mentioned.
 5. `scripts/demo_pii_flight.sh` re-runs live (`tenant-a`, PII in the prompt).
+
+---
+
+## How the software works
+
+Locked. This is the product, not the team process.
+
+Two planes. They never share auth.
+
+| Plane | Who | Auth | Path |
+|---|---|---|---|
+| **Write** | Demo app (machine). Judges do not use this UI. | `X-Tenant-Key` | SDK `flush()` → `POST /v1/traces` |
+| **Read** | Human in the Explorer. | Cognito JWT (`custom:tenant_id`) | Browser → CloudFront → `GET /v1/traces*` |
+
+### Write path (one flight)
+
+1. `scripts/demo_pii_flight.sh` runs `demo-app` as **tenant-a** with a question that contains `user@example.com` and a fake SSN. `--pii` marks the LLM span `sensitive=True`.
+2. Demo does: load corpus from disk → embed → top-k retrieve → one tool (`get_doc_metadata`) → Bedrock `converse`.
+3. SDK opens one `trace_id`. Four spans, same tenant:
+
+| kind | name | parent |
+|---|---|---|
+| http | `demo.ask` | none |
+| rag | `demo.retrieve` | http |
+| tool | `demo.get_doc_metadata` | http |
+| llm | `demo.converse` | http |
+
+4. `flush()` POSTs `{ "spans": [ ... ] }` to the HTTP API. Header `X-Tenant-Key`. Sync. No SQS. No OTLP.
+5. `vault-ingest`: validate schema → map key → `tenant_id` → Presidio + deny-list. Prompt body becomes `prompt_hash` (sha256) + `prompt_preview` (masked, ≤200 chars). **Fail closed:** redaction error → `400 redaction_failed`, nothing written.
+6. Store: S3 SSE-KMS `s3://…/{tenant_id}/{trace_id}/` (span payload). DynamoDB PK=`tenant_id` SK=`trace_id` (list metadata + `expires_at` = now+7d). `cost_usd` / tokens are whatever the SDK sent; vault does not invent them.
+
+Raw prompt never hits S3, Dynamo, CloudWatch, or the UI. SDK may hash before send; vault is authoritative.
+
+### Read path (Explorer)
+
+1. Human hits CloudFront (static Next export). Redirect to Cognito hosted UI. Callback = that CloudFront URL. Token in memory or sessionStorage.
+2. List: `GET /v1/traces?limit=50` with `Authorization: Bearer`. Vault scopes to `custom:tenant_id`. tenant-a never sees tenant-b rows.
+3. Open a flight: `GET /v1/traces/{trace_id}?` via `?trace_id=` in the UI. Same tenant → waterfall + RAG hops + `$` + `REDACTED` preview. Wrong tenant → **403** `{ "error": { "code": "forbidden" } }` (not 404). Missing auth → **401**.
+4. That GET also writes an audit row `{actor, tenant_id, trace_id, ts}` and `GET …/audit` returns the list. TTL remaining comes from `expires_at`.
+5. Day 1 the UI renders fixture JSON with no API. Day 2 the fetcher swaps to these GETs. Same shape either way.
+
+`GET /health` is an API Gateway mock. No Lambda. Load balancers and you can poke it.
+
+### What the screens are
+
+| Screen | Shows |
+|---|---|
+| Sign-in | Cognito hosted UI |
+| Flight list | tenant-scoped flights: id, preview, status, `$` |
+| Waterfall | parent/child llm/rag/tool/http, latency, tokens, `$` |
+| RAG hops | masked query, retrieved doc ids, scores |
+| Audit strip | who opened this trace, when; tenant id; TTL |
+
+No Grafana. No Langfuse. No RCA Bedrock call. The demo CLI is not a page in this app.
+
+### Tenants
+
+Exactly two: `tenant-a`, `tenant-b`. Cognito usernames match. Each has one ingest key in Secrets Manager. Mixing keys is a bug in the demo, not a vault feature.
+
+Dynamo TTL deletes the list row in 7 days. S3 objects follow the same `expires_at` story for the demo (lifecycle can match; do not build a second retention product).
 
 ---
 
