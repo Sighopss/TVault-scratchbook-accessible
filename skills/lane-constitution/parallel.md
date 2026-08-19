@@ -39,12 +39,20 @@ You pick the order that matches **your** dependencies. Write it here. Do not cop
 
 Do not copy files between worktrees. Trevor merging the PR into `main` is the integrate step.
 
+## Cross-machine (per PR)
+
+Local leases do not protect Alexis’s laptop from Trevor’s. Before write: `gh pr list --state open`, read each PR’s **Claimed paths** (`handoffs/README.md`). Overlap → stop.
+
+Every PR commits `handoffs/<your-name>-<id>-<slug>.md` (copy `handoffs/PR.example.md`) and pastes it in the PR body. Pickup: other LLM runs `gh pr view <N>`.
+
 ## Prompt to paste into a parallel agent
 
 ```
 You are <your-name>-<id>.
-Read PLAN.md and skills/<your-lane>/SKILL.md.
+Read PLAN.md, handoffs/README.md, and skills/<your-lane>/SKILL.md.
+gh pr list --state open. If claimed paths overlap yours, stop.
 Execute skills/<your-lane>/agents/<id>.md only.
+Commit handoffs/<your-name>-<id>-<slug>.md on this PR (copy handoffs/PR.example.md).
 Do not commit unless I ask. Do not merge to main — Trevor merges.
 Do not edit paths PLAN.md assigns to someone else.
 ```

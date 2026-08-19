@@ -1,12 +1,12 @@
 # Lane constitution — shared format
 
-This folder is the **team format**. Trevor, Alexis, and Michael all keep these files and these parallel rules. That is what enforces parallel LLMs and three-person handoffs.
+This folder is the **empty format**. Trevor, Alexis, and Michael keep these filenames and the parallel rules. Content is per owner.
 
-Copy **this folder** to `skills/<your-lane>/`. Keep every filename. Do not rewrite `parallel.md` / `ownership.md` / `handoffs.md` rules — only fill `<placeholders>`.
+**Alexis / Michael:** do not wait for Trevor to write your folder. On “ok let’s start”, your LLM follows [`../FILL-CONSTITUTION.md`](../FILL-CONSTITUTION.md): copy this directory, fill placeholders from **your** `PLAN.md` section, write **your** missions, keep writing into `progress.md` as you go.
 
-Then write **your** `SKILL.md` body and `agents/<mission>.md` files for your slice.
+Do **not** copy `skills/trevor-recorder/`. That is Trevor’s filled content.
 
-Do **not** copy `skills/trevor-recorder/`. That is Trevor’s filled content (his missions, paths, APIs). Same format, different content.
+Keep every filename (including `progress.md`). Do not rewrite `parallel.md` / `ownership.md` / `handoffs.md` **rules** — only fill `<placeholders>`.
 
 One agent opens one `agents/<mission>.md`.
 

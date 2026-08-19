@@ -3,7 +3,9 @@
 **Id:** `trevor-ci`  
 **Write:** `.github/` and `Makefile` only
 
-You own CI that blocks a merge and deploys the SaaS from `main`. You do not merge. Trevor merges feature branches into `main`.
+You own CI that blocks a merge and deploys the SaaS from `main`. You do not merge. Trevor merges feature branches into `main`. Alexis/Michael do not write these YAML files.
+
+Last year’s GHA (checked on `CanadaDevOpsCommunity2025`): HemoStat = Sphinx auto-commit to `main` (do not copy). Minions = SSH `:22` + compose redeploy of the demo (steal “CI ships the demo/UI”, not SSH). GenA11y = deploy on **every push** + EC2 + AKIA in `promote.yml` (steal terraform + curl URL; not AKIA/SSH/every-push). VRA and InnerAI had **no** workflows. We use OIDC, path-filtered tests, `deploy.yml` on `main` only.
 
 Minions deployed the workload under test. We deploy **platform + demo-app tests + web** from `main`, not Grafana.
 
@@ -53,7 +55,7 @@ Human checklist (README in Makefile help, do not automate unless asked): `main` 
 
 ## Do not
 
-CodePipeline. Per-PR AWS stacks. Skip gitleaks. Edit application code. Deploy from feature branches.
+CodePipeline. Per-PR AWS stacks. Skip gitleaks. Edit application code. Deploy from feature branches. SSH `:22`. AKIA. Hourly docs-commit CI. `make windows-*`.
 
 ## Done
 

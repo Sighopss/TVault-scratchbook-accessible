@@ -15,14 +15,16 @@ This file is the team plan. Everything below is in here on purpose.
 | Three-person work | Who builds what |
 | HTTP + auth | Routes, JWT, CORS, two Lambdas |
 | Skills format | Parallel agents, same files, your content |
+| Start | Pull → “ok let’s start”: `START.md` (Alexis/Michael fill their own skills) |
 | Tree | Product repo layout |
 | Git / CI | Branches, Trevor merges, checks |
+| Handoffs | One committed file per PR; claimed paths = collision |
 | Prep | Before the clock |
 | 48h table | Hour-by-hour |
 | Look | Explorer target (not Grafana) |
 | Brand | Mark files |
 
-**This GitHub repo is a scratchpad.** `https://github.com/Sighopss/TVault-scratchbook-accessible` is plan, brand, and skills. No `sdk/`, `vault/`, `web/`, `infra/`, or deploy here.
+**This GitHub repo is a scratchpad.** `https://github.com/Sighopss/TVault-scratchbook-accessible` is plan, brand, and skills. No `sdk/`, `vault/`, `web/`, `infra/`, or deploy here. After clone, humans tell their LLM “ok let’s start” — [`START.md`](START.md). Alexis and Michael **fill their own** constitutions ([`skills/FILL-CONSTITUTION.md`](skills/FILL-CONSTITUTION.md)); Trevor does not write those folders.
 
 **Product repo:** Trevor creates a new GitHub repo. That is the only app. Copy this plan + skills into it. Git/CI rules apply **there**.
 
@@ -59,8 +61,8 @@ InnerAI already did “wrap the LLM and dump logs.” Minions already did Grafan
 | **HemoStat** | One package per person. Freeze span JSON **and** HTTP (this file’s HTTP + auth = their `API_PROTOCOL.md`) before lane code. Fail-closed. One demo script. `uv` + Makefile. | Streamlit. Prometheus theater. |
 | **VRA** | Isolated ingest. Security as a test judges watch fail (PII at rest, cross-tenant 403). | AKS. Leftover Next dump. |
 | **InnerAI** | SDK wraps the model call. Four-way split: emit, vault, UI, demo user. | Plaintext prompts. Localhost-only. No tenants. |
-| **Minions** | CI deploys the **demo** and the **UI**, not just infra. `gen_ai.*` names. | Grafana as the product. |
-| **GenA11y** | Terraform from hour 0. Public URL on the slide. Tiny scope. | EC2. SSH `:22`. |
+| **Minions** | CI deploys the **demo** and the **UI**, not just infra. `gen_ai.*` names. (They used SSH `:22` + compose — we use OIDC + `deploy.yml` on `main`.) | Grafana as the product. SSH. |
+| **GenA11y** | Terraform from hour 0. Public URL on the slide. Tiny scope. | EC2. SSH `:22`. AKIA. Deploy on every push. |
 
 Trap: a wrapper + dashboards with no redaction is a weaker InnerAI. Governance is the scoring surface.
 
@@ -74,7 +76,7 @@ Trap: a wrapper + dashboards with no redaction is a weaker InnerAI. Governance i
 | SDK + demo + vault | Python 3.12, `uv` |
 | UI | TypeScript 5.8, Next.js 15 App Router, `pnpm`, `output: 'export'` |
 | IaC | Terraform >= 1.9, AWS, `us-east-1` |
-| CI | GitHub Actions, OIDC, no AKIA |
+| CI | GitHub Actions, OIDC, no AKIA — **Trevor** (`trevor-ci`) |
 | Demo LLM | Bedrock Claude or Nova |
 | Shell | GNU coreutils, WSL2, no PowerShell |
 
@@ -92,6 +94,7 @@ Challenge ideas are **views**, not extra apps. One flight = one `trace_id` with 
 |---|---|---|---|
 | Lane | Recorder + AWS | Vault | Explorer |
 | Git | `sdk/` `demo-app/` `infra/` `scripts/` `.github/` `Makefile` | `vault/` | `web/` `PRODUCT.md` `DESIGN.md` |
+| CI/CD | **Trevor only** — GHA + Makefile (`trevor-ci`) | tests `vault.yml` runs | tests `web.yml` runs |
 | Language | Python + Terraform + GHA | Python 3.12 Lambda | TypeScript / Next.js 15 |
 | Unblocks | Live traces + URL | Storage that cannot leak | The screen judges stare at |
 
@@ -100,7 +103,7 @@ Shared, hour 0 only, all three: `contracts/`. After that, that tree needs all th
 ### Trevor
 
 1. New product GitHub repo. Branch protection. OIDC. Copy plan + skills. Bootstrap Terraform remote state (S3 + lock) once.
-2. CI: `gitleaks`, `trivy`, `sdk.yml`, `vault.yml`, `web.yml`, `infra.yml`, `deploy.yml` (main → apply → `web/` sync → CloudFront invalidation). Rollback = re-run last green deploy.
+2. CI/CD (**Trevor, `trevor-ci`**, writes `.github/` + `Makefile` only): `gitleaks`, `trivy`, `sdk.yml`, `vault.yml`, `web.yml`, `infra.yml`, `deploy.yml` (main → apply → `web/` sync → CloudFront invalidation). Rollback = re-run last green deploy. Alexis/Michael do **not** author workflow YAML.
 3. `sdk/tracevault/`: `start_span` / `end_span` around Bedrock converse + one RAG retrieve. Schema fields including tokens and `cost_usd`. `sensitive=True` hashes/masks before logs. Alexis still redacts at ingest.
 4. `demo-app/`: small corpus, retrieve, one tool, one LLM answer. Two tenant keys.
 5. `scripts/demo_pii_flight.sh`: `tenant-a`, email + fake SSN in the prompt.
@@ -109,7 +112,7 @@ Shared, hour 0 only, all three: `contracts/`. After that, that tree needs all th
 
 ### Alexis
 
-0. Copy `skills/lane-constitution/` → `skills/<your-lane>/`. Write **your** `SKILL.md` and missions. Do not copy `trevor-recorder/`.
+0. Your LLM fills **your** constitution. “Ok let’s start” → [`START.md`](START.md) + [`skills/FILL-CONSTITUTION.md`](skills/FILL-CONSTITUTION.md). Copy `skills/lane-constitution/` → `skills/<your-lane>/`. Write **your** `SKILL.md` and missions from **this section** + HTTP + auth. Keep writing into `progress.md` as you go. Trevor does **not** write this folder. Do not copy `trevor-recorder/`.
 1. `vault/ingest|redact|store|read|audit/` plus `vault/handlers/ingest.py` and `read.py` (the two entrypoints Trevor zips).
 2. Implement **HTTP + auth** below exactly.
 3. Presidio + deny-list (SSN, email, AWS keys, `sk-`). Prompt → `prompt_hash` + masked `prompt_preview`. Persist Trevor’s `cost_usd` / tokens; do not invent them. S3 `…/{tenant_id}/{trace_id}/`. Dynamo PK `tenant_id` SK `trace_id`.
@@ -117,7 +120,7 @@ Shared, hour 0 only, all three: `contracts/`. After that, that tree needs all th
 
 ### Michael
 
-0. Same constitution copy. Then Impeccable: `/impeccable init` → `PRODUCT.md` (Operate), hooks on, `/impeccable shape` the four screens **before** components. Draft at the end of this section. Do not open `web/` until `PRODUCT.md` exists.
+0. Same as Alexis: your LLM fills **your** constitution (`START.md` + `skills/FILL-CONSTITUTION.md`). Then Impeccable: `/impeccable init` → `PRODUCT.md` (Operate), hooks on, `/impeccable shape` the four screens **before** components. Draft at the end of this section. Do not open `web/` until `PRODUCT.md` exists. Trevor does **not** write your skills.
 1. Next.js 15, `output: 'export'`. Screens: Cognito hosted UI, flight list, waterfall, audit/tenant strip. Detail via `?trace_id=` (no dynamic `[id]`).
 2. Day 1: `contracts/fixtures/tenant-a-rag.json` only. Day 2: fetcher → `GET /v1/traces*` below. Env from Trevor outputs: `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_COGNITO_*`. No hardcoded URLs.
 3. Waterfall (parent-child, latency, tokens, `$`), RAG hops (masked query, doc ids, scores), badges `REDACTED` / tenant / TTL, tenant switcher, 403 from contracted error JSON.
@@ -211,7 +214,7 @@ Tokens in memory or sessionStorage. Trevor outputs these values. Michael does no
 
 Same **format** for all three. Different **content**. That is what enforces parallel LLMs and three-person handoffs.
 
-Copy [`skills/lane-constitution/`](skills/lane-constitution/) to `skills/<your-lane>/`. Keep every filename. Fill placeholders. Write **your** `SKILL.md` and `agents/<mission>.md`. Do **not** clone [`skills/trevor-recorder/`](skills/trevor-recorder/) (Trevor’s missions, paths, APIs).
+Alexis and Michael fill their own folders. Procedure: [`START.md`](START.md) + [`skills/FILL-CONSTITUTION.md`](skills/FILL-CONSTITUTION.md). Copy [`skills/lane-constitution/`](skills/lane-constitution/) to `skills/<your-lane>/`. Keep every filename. Fill placeholders from **your** PLAN section. Write **your** `SKILL.md` and `agents/<mission>.md`. After each session, append `progress.md`. Do **not** clone [`skills/trevor-recorder/`](skills/trevor-recorder/) (Trevor’s missions, paths, APIs). Trevor does not author those two folders.
 
 ```text
 skills/<your-lane>/
@@ -222,25 +225,29 @@ skills/<your-lane>/
   enterprise.md
   handoffs.md
   workflow.md
+  progress.md
   agents/<mission>.md
 ```
 
 Mirror `SKILL.md` to `.cursor/skills/<your-lane>/`, `.claude/skills/<your-lane>/`, `.kiro/skills/<your-lane>/`. Add paste blocks to `AGENTS.md`. Register in `skills/INDEX.md`.
 
-**Parallel (do not rewrite):**
+**Parallel (do not rewrite lease/worktree rules):**
 
 - One agent id, one mission file, one path set.
-- Lease in repo-root `.agent-leases.json` (all lanes share it). Overlap + started < 4h ago → stop. Do not delete someone else’s lease.
+- Lease in repo-root `.agent-leases.json` (all lanes share it, gitignored). Overlap + started < 4h ago → stop. Do not delete someone else’s lease.
+- **Per PR:** commit `handoffs/<name>-<id>-<slug>.md` (see [`handoffs/README.md`](handoffs/README.md)). Paste it in the PR body. Before write: `gh pr list` — overlapping **Claimed paths** → stop. Local leases do not see other laptops.
 - `git worktree add .worktrees/<name>-<id> -b <name>/<id>/<slug>`
 - Open a PR. **Do not merge — Trevor merges.**
-- Need another lane → `handoffs/FROM-<you>.md` and stop.
+- Need another lane → that handoff file on the PR, then stop.
 
 Paste:
 
 ```
 You are <your-name>-<id>.
-Read PLAN.md and skills/<your-lane>/SKILL.md.
+Read PLAN.md, handoffs/README.md, and skills/<your-lane>/SKILL.md.
+gh pr list --state open. If claimed paths overlap yours, stop.
 Execute skills/<your-lane>/agents/<id>.md only.
+Commit handoffs/<your-name>-<id>-<slug>.md on this PR.
 Do not commit unless I ask. Do not merge to main — Trevor merges.
 Do not edit paths PLAN.md assigns to someone else.
 ```
@@ -264,7 +271,8 @@ infra/               # Trevor
 scripts/demo_pii_flight.sh
 .github/workflows/
 Makefile
-PLAN.md  PRODUCT.md  DESIGN.md  AGENTS.md
+PLAN.md  PRODUCT.md  DESIGN.md  AGENTS.md  START.md
+handoffs/README.md  handoffs/PR.example.md  handoffs/<name>-<id>-<slug>.md   # one file per PR
 skills/INDEX.md
 skills/lane-constitution/
 skills/trevor-recorder/
@@ -276,7 +284,27 @@ skills/<michael-lane>/
 
 ## Git / CI
 
+**Owner: Trevor.** Agent id `trevor-ci`. Writes `.github/` and `Makefile`. Mission: [`skills/trevor-recorder/agents/ci.md`](skills/trevor-recorder/agents/ci.md). Alexis owns tests under `vault/` (job `vault.yml` runs them). Michael owns tests under `web/` (job `web.yml` runs them). Neither writes Actions YAML.
+
 `main` protected. Feature branch + PR. Humans: `alexis/<slug>`, `michael/<slug>`, `trevor/<slug>`. Trevor agents: `trevor/<id>/<slug>`. **Only Trevor merges.** Schema/`http.md` PRs: all three in the thread. No push to `main`. No deploy from feature branches. No CodePipeline. No per-PR stacks.
+
+Every PR: committed `handoffs/<name>-<id>-<slug>.md` + same text in the PR body ([`.github/pull_request_template.md`](.github/pull_request_template.md)). Collision = claimed-path overlap with an **open** PR, or local lease overlap.
+
+### What last year actually ran (steal OS, not their deploy)
+
+Checked `CanadaDevOpsCommunity2025` repos:
+
+| Repo | What CI/CD was | Steal | Do not copy |
+|---|---|---|---|
+| **HemoStat** | `Makefile` + `uv`. GHA was hourly Sphinx that **commits docs to main**. | Unix Makefile, `uv`, skip-if-missing targets. | Docs auto-commit, `windows-*` make, Grafana provision YAML. |
+| **Minions** | `redeploy.yaml` on `main`: SSH `:22` + `docker compose` the **demo**. | CI deploys the thing judges hit (our `demo-app` tests + `web/` sync), not only Terraform. | SSH, Docker-on-a-box, echo secrets in logs. |
+| **GenA11yHelper** | `deploy.yml` on **every push** → Docker Hub → SSH EC2. `promote.yml` used **AKIA**. | Terraform in the pipeline. Curl the public URL after apply. | EC2, `:22`, AKIA, deploy on every feature push. |
+| **VRA** | No `.github/workflows`. Security lived in pytest (`test_hmac.py`). | Security as a **required check** (`vault.yml` SSN/403). | No pipeline. |
+| **InnerAI** | No GHA. `fastapi dev` + CSV. | Nothing. | Localhost-only. |
+
+Ours: GitHub Actions + **OIDC** (no AKIA). Deploy **`main` only**. Rollback = re-run last green `deploy.yml`.
+
+### CODEOWNERS
 
 ```
 /contracts/  @trevor @alexis @michael
@@ -285,14 +313,14 @@ skills/<michael-lane>/
 /web/ /PRODUCT.md /DESIGN.md  @michael
 ```
 
-| Trigger | Job |
-|---|---|
-| Any PR | gitleaks, trivy |
-| `vault/**` | pytest + bandit (SSN fail-closed) |
-| `web/**` | lint + Playwright |
-| `sdk/**` `demo-app/**` | golden span vs schema |
-| `infra/**` | terraform plan |
-| `main` | apply dev (prod if approved) → sync web → invalidate |
+| Trigger | Job | Owner of YAML | Owner of code under test |
+|---|---|---|---|
+| Any PR | gitleaks, trivy | Trevor | all |
+| `vault/**` | pytest + bandit (SSN fail-closed) | Trevor | Alexis |
+| `web/**` | lint + Playwright | Trevor | Michael |
+| `sdk/**` `demo-app/**` | golden span vs schema | Trevor | Trevor |
+| `infra/**` | terraform plan | Trevor | Trevor |
+| `main` | apply dev (prod if approved) → sync web → invalidate | Trevor | — |
 
 ---
 
@@ -302,9 +330,9 @@ skills/<michael-lane>/
 
 **Trevor:** AWS account + OIDC role. Bedrock enabled `us-east-1`. Product repo + protection + empty CI. Remote-state bucket + lock table. Confirm Alexis/Michael have coreutils, WSL, Impeccable (Michael).
 
-**Alexis:** Least-privilege AWS (not root in Cursor). Presidio hello-world (SSN, email, AWS key). Deny-list on paper. Skill folder filled. HTTP + auth section read.
+**Alexis:** Least-privilege AWS (not root in Cursor). Presidio hello-world (SSN, email, AWS key). Deny-list on paper. Skill folder filled **by your LLM** (`FILL-CONSTITUTION.md`). HTTP + auth section read.
 
-**Michael:** Impeccable skill loaded. `PRODUCT.md` written. Skill folder filled.
+**Michael:** Impeccable skill loaded. Skill folder filled **by your LLM**. `PRODUCT.md` written (product repo).
 
 **Hour 0 (90 min, together):** lock `span.schema.json` + `http.md` (copy HTTP + auth) + both **full flight** fixtures. No lane code before that.
 
@@ -314,13 +342,13 @@ skills/<michael-lane>/
 
 | Window | Trevor | Alexis | Michael |
 |---|---|---|---|
-| −1 | Repo, OIDC, Bedrock | Presidio, deny-list, skills | Impeccable init + shape |
+| −1 | Repo, OIDC, **empty CI** (gitleaks + trivy), Bedrock | Presidio, deny-list, skills | Impeccable init + shape |
 | 0 | Schema + http.md; callback URL | Redaction + 403 cases on contract | Fixture wireframe; `NEXT_PUBLIC_*` names |
 | D1 AM | SDK + demo emit | Ingest + persist | Waterfall + hops on fixtures |
 | D1 PM | CORS + two Lambdas | Presidio + audit GET | Cost + tenant switcher |
-| Night | Apply: `/health`, alarm, state | Isolation tests | Harden 403/empty; export builds |
+| Night | `deploy.yml` apply: `/health`, alarm, state | Isolation tests | Harden 403/empty; export builds |
 | D2 AM | URL + web sync + two users | Live S3 leak tests | Live API + Playwright 403 |
-| D2 PM | URL alive; re-run deploy | Judge governance Qs | Click-through |
+| D2 PM | URL alive; re-run last green `deploy.yml` | Judge governance Qs | Click-through |
 
 ---
 

@@ -39,7 +39,7 @@ Judge trigger Trevor owes: `scripts/demo_pii_flight.sh` runs a demo whose user p
 
 **Never:** Streamlit/Grafana UI, Langfuse/Phoenix store, EKS/AKS, OpenSearch, stock OTLP export of raw prompts, commit AWS keys, force-push `main`, commit unless the human asked, start long-running servers, log raw prompts.
 
-If you need a vault or web change: write `handoffs/FROM-trevor.md` using the template in [handoffs.md](handoffs.md) and stop.
+If you need a vault or web change: write `handoffs/trevor-<id>-<slug>.md` using [handoffs.md](handoffs.md) / `handoffs/PR.example.md`, put it on the PR, and stop.
 
 ## Parallel (one computer, many agents)
 
@@ -69,4 +69,4 @@ Full pin list: [stack.md](stack.md). Security bar: [enterprise.md](enterprise.md
 
 ## After the mission
 
-Release the lease. Leave a 10-line handoff: what files, what env vars, what is blocked on Alexis/Michael. Do not start the next mission unless the human named it.
+Release the lease. The per-PR handoff file is the handoff: claimed paths, env names, blocked on Alexis/Michael. Do not start the next mission unless the human named it.

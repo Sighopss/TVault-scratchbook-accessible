@@ -1,30 +1,14 @@
 # Handoffs
 
-You do not implement Alexis or Michael. You leave them a file they can drop into their agent.
+You do not implement Alexis or Michael. You leave a **per-PR file** their LLM can load.
+
+Team protocol: repo [`handoffs/README.md`](../../handoffs/README.md). Template: [`handoffs/PR.example.md`](../../handoffs/PR.example.md).
+
+Every PR commits `handoffs/trevor-<id>-<slug>.md` and pastes it into the PR body. **Not gitignored.** Not chat-only.
 
 HTTP is `contracts/http.draft.md` until hour 0, then `contracts/http.md`. Do not invent routes.
 
-Write `handoffs/FROM-trevor-<id>.md` (gitignored unless the human asked). Template:
-
-```markdown
-# Handoff from trevor-<id>
-Date:
-Blocked on: Alexis | Michael | Human
-
-## What I shipped
-- paths:
-- outputs / env vars:
-
-## What I need
-- vault handlers present? (ingest.py / read.py)
-- web export dir (`web/out` or whatever `next export` wrote):
-
-## Contract reminder
-See contracts/http.md
-POST /v1/traces  X-Tenant-Key
-GET  /v1/traces*  Authorization Bearer (Cognito)
-GET  /health
-```
+If you need vault or web changed: fill the handoff, stop. Do not implement their tree.
 
 ## Direction table
 

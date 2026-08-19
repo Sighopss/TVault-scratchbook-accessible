@@ -43,11 +43,19 @@ After SDK is importable: `trevor-demo`. After demo CLI exists: `trevor-scripts`.
 
 Do not copy files between worktrees. Trevor merging the PR into `main` is the integrate step.
 
+## Cross-machine (per PR)
+
+Local `.agent-leases.json` does not see Alexis’s or Michael’s laptops. Before write: `gh pr list --state open`, read **Claimed paths** in each PR (`handoffs/README.md`). Overlap → stop.
+
+Every PR commits `handoffs/trevor-<id>-<slug>.md` (copy `handoffs/PR.example.md`) and pastes it in the PR body.
+
 ## Prompt to paste into a parallel agent
 
 ```
-You are trevor-sdk. Load PLAN.md and skills/trevor-recorder/SKILL.md
-then execute skills/trevor-recorder/agents/sdk.md only.
+You are trevor-sdk. Load PLAN.md, handoffs/README.md, and skills/trevor-recorder/SKILL.md.
+gh pr list --state open. If claimed paths overlap yours, stop.
+Execute skills/trevor-recorder/agents/sdk.md only.
+Commit handoffs/trevor-sdk-<slug>.md on this PR.
 Do not edit vault/ or web/. Do not commit unless I ask.
 ```
 

@@ -13,6 +13,8 @@ metadata:
 
 You are a coding agent on **<your-name>’s lane**.
 
+If this file still contains `<placeholders>`, stop implementing. Run repo `START.md` and `skills/FILL-CONSTITUTION.md` first — fill this constitution from `PLAN.md` yourself. Do not copy `skills/trevor-recorder/`.
+
 Read repo-root `PLAN.md` and this file before any edit. Then open **exactly one** mission file under `agents/` that matches your assigned id. Execute that mission. Do not wander into another mission.
 
 If `PLAN.md` is missing, stop.
@@ -33,7 +35,7 @@ One product. Your job is the slice in PLAN.md under your name. Do not invent a s
 
 **Never:** commit secrets, force-push `main`, merge to `main` (Trevor merges), commit unless the human asked, start long-running servers.
 
-If you need another lane changed: write `handoffs/FROM-<your-name>.md` using [handoffs.md](handoffs.md) and stop.
+If you need another lane changed: write `handoffs/<your-name>-<id>-<slug>.md` from [handoffs.md](handoffs.md) / repo `handoffs/PR.example.md`, put it on the PR, and stop.
 
 ## Parallel (one computer, many agents)
 
@@ -55,4 +57,4 @@ Fill [stack.md](stack.md) with **your** runtime and libs. Security bar: [enterpr
 
 ## After the mission
 
-Release the lease. Leave a 10-line handoff: what files, what env vars, what is blocked on the other humans. Do not start the next mission unless the human named it.
+Release the lease. The per-PR handoff file is the handoff (claimed paths, shipped, blocked). Do not start the next mission unless the human named it.
