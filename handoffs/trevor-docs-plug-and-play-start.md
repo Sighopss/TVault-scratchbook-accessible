@@ -24,6 +24,7 @@ skills/trevor-recorder/handoffs.md
 skills/trevor-recorder/parallel.md
 skills/trevor-recorder/workflow.md
 skills/trevor-recorder/SKILL.md
+skills/trevor-recorder/agents/ci.md
 ```
 
 ## Do not touch
