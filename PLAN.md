@@ -38,13 +38,13 @@ Public HTTPS. Two Cognito tenants. Sign-in. Write + read APIs. PII never at rest
 
 **Do not build:** custom domain, multi-region, PITR, CloudTrail, billing, SOC2, pager, RCA-via-Bedrock.
 
-Kill if time slips: RCA → extra cost charts (keep one `$`) → extra span kinds. **Never kill:** redaction, 403, HTTPS URL, fixture UI, `/health`, CORS, JWT→`custom:tenant_id`.
+Kill if time slips: welcome copy extras → RCA → extra cost charts (keep one `$`) → extra span kinds. **Never kill:** redaction, 403, HTTPS URL, fixture UI, `/health`, CORS, JWT→`custom:tenant_id`. Welcome may die; Cognito can still be the first hit.
 
 ---
 
 ## Judge path
 
-1. Public AWS URL. Sign in as **tenant-a**. One RAG/agent flight: spans, hops, tokens, `$`.
+1. Public AWS URL. **Welcome** (`/`, Michael). Sign in as **tenant-a** (Cognito hosted UI). One RAG/agent flight: spans, hops, tokens, `$`.
 2. That flight’s prompt had email/SSN. Stored payload masked. Hash only. UI shows `REDACTED`.
 3. Sign in as **tenant-b**. Same `trace_id` → **403**. List does not include tenant-a.
 4. Audit row: who opened the trace, when. TTL mentioned.
@@ -120,8 +120,8 @@ Shared, hour 0 only, all three: `contracts/`. After that, that tree needs all th
 
 ### Michael
 
-0. Same as Alexis: your LLM fills **your** constitution (`START.md` + `skills/FILL-CONSTITUTION.md`). Then Impeccable: `/impeccable init` → `PRODUCT.md` (Operate), hooks on, `/impeccable shape` the four screens **before** components. Draft at the end of this section. Do not open `web/` until `PRODUCT.md` exists. Trevor does **not** write your skills.
-1. Next.js 15, `output: 'export'`. Screens: Cognito hosted UI, flight list, waterfall, audit/tenant strip. Detail via `?trace_id=` (no dynamic `[id]`).
+0. Same as Alexis: your LLM fills **your** constitution (`START.md` + `skills/FILL-CONSTITUTION.md`). Then Impeccable: `/impeccable init` → `PRODUCT.md` (Operate), hooks on, `/impeccable shape` the screens **before** components (welcome + list + waterfall + audit strip). Draft at the end of this section. Do not open `web/` until `PRODUCT.md` exists. Trevor does **not** write your skills.
+1. Next.js 15, `output: 'export'`. Screens: **welcome** (`/`, unauthenticated — mark, one-line what this is, Sign in → Cognito hosted UI). Then flight list, waterfall, audit/tenant strip. Detail via `?trace_id=` (no dynamic `[id]`). One welcome route, not a campaign site. Alexis does not design this — vault is the heavier lane.
 2. Day 1: `contracts/fixtures/tenant-a-rag.json` only. Day 2: fetcher → `GET /v1/traces*` below. Env from Trevor outputs: `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_COGNITO_*`. No hardcoded URLs.
 3. Waterfall (parent-child, latency, tokens, `$`), RAG hops (masked query, doc ids, scores), badges `REDACTED` / tenant / TTL, tenant switcher, 403 from contracted error JSON.
 4. Playwright: fixture A renders; fixture B hides SSN; live tenant-b 403.
@@ -135,13 +135,13 @@ web
 ## Stack
 Next.js 15 App Router, output export, Cognito hosted UI, fixtures then GET /v1/traces*.
 ## Users
-On-call ML/SRE reconstructing one AI request. Not a marketing site.
+On-call ML/SRE reconstructing one AI request. One welcome gate at `/`, then operate. Not a campaign site.
 ## Product Purpose
 Replay one request (LLM, tools, RAG, cost, errors) without storing raw prompts or PII.
 ## Positioning
 Write-time redaction, tenant isolation. Not Grafana. Not Langfuse.
 ## Constraints
-Raw prompts never persist. Cross-tenant 403. Every view audited. DynamoDB TTL. TraceVault black/blue/cyan.
+Raw prompts never persist. Cross-tenant 403. Every view audited. DynamoDB TTL. TraceVault black/blue/cyan. Unauthenticated `/` is welcome + Sign in only — no extra marketing routes.
 ## Terminology
 Flight = one trace. Kinds: llm, tool, rag, http.
 ```
@@ -344,7 +344,7 @@ Ours: GitHub Actions + **OIDC** (no AKIA). Deploy **`main` only**. Rollback = re
 |---|---|---|---|
 | −1 | Repo, OIDC, **empty CI** (gitleaks + trivy), Bedrock | Presidio, deny-list, skills | Impeccable init + shape |
 | 0 | Schema + http.md; callback URL | Redaction + 403 cases on contract | Fixture wireframe; `NEXT_PUBLIC_*` names |
-| D1 AM | SDK + demo emit | Ingest + persist | Waterfall + hops on fixtures |
+| D1 AM | SDK + demo emit | Ingest + persist | Welcome `/` + waterfall + hops on fixtures |
 | D1 PM | CORS + two Lambdas | Presidio + audit GET | Cost + tenant switcher |
 | Night | `deploy.yml` apply: `/health`, alarm, state | Isolation tests | Harden 403/empty; export builds |
 | D2 AM | URL + web sync + two users | Live S3 leak tests | Live API + Playwright 403 |
@@ -354,7 +354,7 @@ Ours: GitHub Actions + **OIDC** (no AKIA). Deploy **`main` only**. Rollback = re
 
 ## Look
 
-This is the Explorer target for the 48 hours: reconstruct **one AI request** (list → waterfall → hops → `$` → `REDACTED`). Not a Grafana KPI wall. Michael shapes to this; Impeccable Operate; same brand tokens as **Brand**.
+This is the Explorer target for the 48 hours: **welcome `/`** (Sign in) → reconstruct **one AI request** (list → waterfall → hops → `$` → `REDACTED`). Not a Grafana KPI wall. Michael owns welcome + Explorer (Impeccable Operate). Same brand tokens as **Brand**.
 
 ![TraceVault Explorer — how it will look](assets/tracevault-explorer-sample.png)
 
