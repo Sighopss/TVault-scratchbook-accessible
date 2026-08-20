@@ -4,7 +4,7 @@
 - Human: Trevor
 - Agent id: trevor-docs
 - Branch: `trevor/docs/welcome-michael`
-- PR: TBD
+- PR: 8
 - Mission file: n/a (PLAN assignment only)
 
 ## Claimed paths (collision)
