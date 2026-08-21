@@ -4,7 +4,7 @@
 - Human: Trevor
 - Agent id: trevor-docs
 - Branch: `trevor/docs/security-governance`
-- PR: TBD
+- PR: 9
 - Mission file: n/a (PLAN)
 
 ## Claimed paths (collision)
