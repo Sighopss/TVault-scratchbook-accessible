@@ -98,35 +98,43 @@ Challenge ideas are **views**, not extra apps. One flight = one `trace_id` with 
 | CI/CD | **Trevor only** — GHA + Makefile (`trevor-ci`) | tests `vault.yml` runs | tests `web.yml` runs |
 | Language | Python + Terraform + GHA | Python 3.12 Lambda | TypeScript / Next.js 15 |
 | Unblocks | Live traces + URL | Storage that cannot leak | The screen judges stare at |
+| Tasks | **7** (repo/CI, SDK, demo, script, Terraform, URL) | **7** (redact, store, ingest, read, audit, HTTP, tests) | **7** (PRODUCT, welcome, list, waterfall, chrome, data, e2e) |
 
 Shared, hour 0 only, all three: `contracts/`. After that, that tree needs all three on the PR.
 
+Same count on purpose. Vault is not a light lane — PLAN used to hide it in four bullets. Nobody picks up another human’s tree to “balance.”
+
 ### Trevor
 
-1. New product GitHub repo. Branch protection. OIDC. Copy plan + skills. Bootstrap Terraform remote state (S3 + lock) once.
-2. CI/CD (**Trevor, `trevor-ci`**, writes `.github/` + `Makefile` only): `gitleaks`, `trivy`, `sdk.yml`, `vault.yml`, `web.yml`, `infra.yml`, `deploy.yml` (main → apply → `web/` sync → CloudFront invalidation). Rollback = re-run last green deploy. Alexis/Michael do **not** author workflow YAML.
-3. `sdk/tracevault/`: `start_span` / `end_span` around Bedrock converse + one RAG retrieve. Schema fields including tokens and `cost_usd`. `sensitive=True` hashes/masks before logs. Alexis still redacts at ingest.
+1. Product GitHub repo. Branch protection. OIDC. Copy plan + skills. Bootstrap Terraform remote state (S3 + lock) once.
+2. CI/CD (`trevor-ci`): `.github/` + `Makefile` — `gitleaks`, `trivy`, `sdk.yml`, `vault.yml`, `web.yml`, `infra.yml`, `deploy.yml`. Rollback = re-run last green deploy. Alexis/Michael do **not** author workflow YAML.
+3. `sdk/tracevault/`: `start_span` / `end_span` around Bedrock converse + one RAG retrieve. Tokens + `cost_usd`. `sensitive=True` hashes/masks before logs. Alexis still redacts at ingest.
 4. `demo-app/`: small corpus, retrieve, one tool, one LLM answer. Two tenant keys.
 5. `scripts/demo_pii_flight.sh`: `tenant-a`, email + fake SSN in the prompt.
-6. Terraform per **HTTP + auth** and **Security + governance**: CORS, JWT authorizer, API key ingest, `/health` mock, two Lambdas, Cognito `custom:tenant_id`, CloudFront HTTPS-only + CSP/HSTS, WAF, KMS, secrets placeholders, logs 7d, 5xx alarm, OIDC, throttle. Outputs: `api_url`, `cloudfront_url`, Cognito ids/domain for `NEXT_PUBLIC_*`.
-7. Keep the URL alive.
+6. Terraform per **HTTP + auth** and **Security + governance**: CORS, JWT, ingest key, `/health`, two Lambdas, Cognito, CloudFront HTTPS-only + headers, WAF, KMS, secrets placeholders, logs 7d, 5xx alarm, OIDC, throttle. Outputs for `NEXT_PUBLIC_*`.
+7. Keep the URL alive (re-run last green `deploy.yml` if it dies).
 
 ### Alexis
 
-0. Your LLM fills **your** constitution. “Ok let’s start” → [`START.md`](START.md) + [`skills/FILL-CONSTITUTION.md`](skills/FILL-CONSTITUTION.md). Copy `skills/lane-constitution/` → `skills/<your-lane>/`. Write **your** `SKILL.md` and missions from **this section** + HTTP + auth. Keep writing into `progress.md` as you go. Trevor does **not** write this folder. Do not copy `trevor-recorder/`.
-1. `vault/ingest|redact|store|read|audit/` plus `vault/handlers/ingest.py` and `read.py` (the two entrypoints Trevor zips).
-2. Implement **HTTP + auth** below exactly.
-3. Presidio + deny-list (SSN, email, AWS keys, `sk-`). Prompt → `prompt_hash` + masked `prompt_preview`. Persist Trevor’s `cost_usd` / tokens; do not invent them. S3 `…/{tenant_id}/{trace_id}/`. Dynamo PK `tenant_id` SK `trace_id`.
-4. Tests (VRA style): SSN never in S3/Dynamo; tenant-a JWT cannot read tenant-b; missing auth → contracted `401` JSON.
+0. Your LLM fills **your** constitution. “Ok let’s start” → [`START.md`](START.md) + [`skills/FILL-CONSTITUTION.md`](skills/FILL-CONSTITUTION.md). Copy `skills/lane-constitution/` → `skills/<your-lane>/`. Write **your** `SKILL.md` and **one mission file per numbered task below**. Keep writing into `progress.md`. Trevor does **not** write this folder. Do not copy `trevor-recorder/`. Do not write `web/` or `infra/`.
+1. `vault/redact/`: Presidio + deny-list (SSN, email, AWS keys, `sk-`). Prompt → `prompt_hash` + masked `prompt_preview`. Fail-closed → `RedactionError` (ingest maps to `redaction_failed`, nothing stored).
+2. `vault/store/`: S3 `{tenant_id}/{trace_id}/` SSE-KMS, Dynamo PK/SK, TTL `expires_at` 7d. No partial write. Persist Trevor’s `cost_usd` / tokens — do not invent them.
+3. `vault/ingest/` + `vault/handlers/ingest.py`: `POST /v1/traces`, `X-Tenant-Key` → tenant, schema validate, redact, store, `202`.
+4. `vault/read/` + `vault/handlers/read.py`: `GET /v1/traces` and `GET /v1/traces/{trace_id}`. JWT `custom:tenant_id`. Mismatch → **403 not 404**. `limit` max 50.
+5. `vault/audit/`: GET detail writes a row. `GET .../audit` returns `{events:[{actor,tenant_id,trace_id,ts}]}` tenant-scoped.
+6. HTTP **error JSON** exactly (`unauthorized` / `forbidden` / `invalid` / `redaction_failed`). `message` never contains PII, prompts, or keys.
+7. Tests (VRA style, `vault.yml` runs them): SSN/email/`AKIA` never in stored JSON; tenant-a JWT cannot read tenant-b; missing auth → 401; redact fail → 400 and store not called.
 
 ### Michael
 
-0. Same as Alexis: your LLM fills **your** constitution (`START.md` + `skills/FILL-CONSTITUTION.md`). Then Impeccable: `/impeccable init` → `PRODUCT.md` (Operate), hooks on, `/impeccable shape` the screens **before** components (welcome + list + waterfall + audit strip). Draft at the end of this section. Do not open `web/` until `PRODUCT.md` exists. Trevor does **not** write your skills.
-1. Next.js 15, `output: 'export'`. Screens: **welcome** (`/`, unauthenticated — mark, one-line what this is, Sign in → Cognito hosted UI). Then flight list, waterfall, audit/tenant strip. Detail via `?trace_id=` (no dynamic `[id]`). One welcome route, not a campaign site. Alexis does not design this — vault is the heavier lane.
-2. Day 1: `contracts/fixtures/tenant-a-rag.json` only. Day 2: fetcher → `GET /v1/traces*` below. Env from Trevor outputs: `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_COGNITO_*`. No hardcoded URLs.
-3. Waterfall (parent-child, latency, tokens, `$`), RAG hops (masked query, doc ids, scores), badges `REDACTED` / tenant / TTL, tenant switcher, 403 from contracted error JSON.
-4. Playwright: fixture A renders; fixture B hides SSN; live tenant-b 403.
-5. After first real page: `/impeccable document` → `DESIGN.md`. Finish: `/impeccable harden` then `audit`.
+0. Same constitution fill as Alexis (`START.md` + `FILL-CONSTITUTION.md`). Then Impeccable: `/impeccable init` → `PRODUCT.md` (Operate), hooks on, `/impeccable shape` **before** components. Draft at the end of this section. Do not open `web/` until `PRODUCT.md` exists. Trevor does **not** write your skills. Do not write `vault/`.
+1. `PRODUCT.md` + shape: welcome, list, waterfall, audit/tenant strip (Operate, brand tokens).
+2. Welcome `/` (unauthenticated): mark, one-line what this is, Sign in → Cognito hosted UI. One route, not a campaign site.
+3. Flight list (signed in). Detail via `?trace_id=` (no dynamic `[id]`). Next.js 15, `output: 'export'`.
+4. Waterfall (parent-child, latency, tokens, `$`) + RAG hops (masked query, doc ids, scores).
+5. Audit/tenant strip: badges `REDACTED` / tenant / TTL, tenant switcher, 403 UI from contracted error JSON.
+6. Day 1: `contracts/fixtures/tenant-a-rag.json` only. Day 2: fetcher → `GET /v1/traces*`. Env from Trevor: `NEXT_PUBLIC_*`. No hardcoded URLs.
+7. Playwright: fixture A renders; fixture B hides SSN; live tenant-b 403. After first real page: `/impeccable document` → `DESIGN.md`. Finish: `/impeccable harden` then `audit`.
 
 ```markdown
 # Product
@@ -374,13 +382,13 @@ Ours: GitHub Actions + **OIDC** (no AKIA). Deploy **`main` only**. Rollback = re
 
 | Window | Trevor | Alexis | Michael |
 |---|---|---|---|
-| −1 | Repo, OIDC, **empty CI** (gitleaks + trivy), Bedrock | Presidio, deny-list, skills | Impeccable init + shape |
-| 0 | Schema + http.md; callback URL | Redaction + 403 cases on contract | Fixture wireframe; `NEXT_PUBLIC_*` names |
-| D1 AM | SDK + demo emit | Ingest + persist | Welcome `/` + waterfall + hops on fixtures |
-| D1 PM | CORS + two Lambdas | Presidio + audit GET | Cost + tenant switcher |
-| Night | `deploy.yml` apply: `/health`, alarm, state | Isolation tests | Harden 403/empty; export builds |
-| D2 AM | URL + web sync + two users | Live S3 leak tests | Live API + Playwright 403 |
-| D2 PM | URL alive; re-run last green `deploy.yml` | Judge governance Qs | Click-through |
+| −1 | Repo, OIDC, empty CI | Skills + Presidio hello-world + deny-list | Skills + Impeccable init + PRODUCT shape |
+| 0 | Schema + http.md; callback URL | **1 redact** cases on contract | Fixture wireframe; `NEXT_PUBLIC_*` names |
+| D1 AM | **3–4** SDK + demo emit | **2–3** store + ingest handler | **2–4** Welcome + list + waterfall on fixtures |
+| D1 PM | **6** CORS + two Lambdas | **1+5** Presidio wired + audit GET | **5** Cost + tenant switcher + 403 chrome |
+| Night | **2+7** `deploy.yml`: `/health`, alarm | **7** Isolation tests (403/SSN/401) | **7** Harden 403/empty; export build |
+| D2 AM | URL + web sync + two users | Live S3 leak tests (still **7**) | **6–7** Live API + Playwright 403 |
+| D2 PM | URL alive; re-run last green `deploy.yml` | Judge governance Qs (her tests) | Click-through |
 
 ---
 
