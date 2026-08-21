@@ -4,7 +4,7 @@
 - Human: Trevor
 - Agent id: trevor-docs
 - Branch: `trevor/docs/split`
-- PR: TBD
+- PR: 10
 - Mission file: n/a (PLAN split)
 
 ## Claimed paths (collision)
