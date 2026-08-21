@@ -14,6 +14,7 @@ This file is the team plan. Everything below is in here on purpose.
 | Stack | Languages, AWS, brand tokens |
 | Three-person work | Who builds what |
 | HTTP + auth | Routes, JWT, CORS, two Lambdas |
+| Security + governance | 48h AWS prod bar, assigned; not SOC2 |
 | Skills format | Parallel agents, same files, your content |
 | Start | Pull → “ok let’s start”: `START.md` (Alexis/Michael fill their own skills) |
 | Tree | Product repo layout |
@@ -34,9 +35,9 @@ Hour 0 also writes `contracts/http.md` by copying **HTTP + auth** below, and `co
 
 ## Done-bar
 
-Public HTTPS. Two Cognito tenants. Sign-in. Write + read APIs. PII never at rest. Secrets not in git. UI and API both live. `GET /health` 200. 5xx alarm. Rollback = re-run last green `deploy.yml`.
+Public HTTPS. Two Cognito tenants. Sign-in. Write + read APIs. PII never at rest. Secrets not in git. UI and API both live. `GET /health` 200. 5xx alarm. Rollback = re-run last green `deploy.yml`. Controls: **Security + governance** below.
 
-**Do not build:** custom domain, multi-region, PITR, CloudTrail, billing, SOC2, pager, RCA-via-Bedrock.
+**Do not build:** custom domain, multi-region, PITR, CloudTrail, GuardDuty, VPC-for-Lambda, MFA (breaks one-shot judge login), billing, SOC2 binder, pager, RCA-via-Bedrock.
 
 Kill if time slips: welcome copy extras → RCA → extra cost charts (keep one `$`) → extra span kinds. **Never kill:** redaction, 403, HTTPS URL, fixture UI, `/health`, CORS, JWT→`custom:tenant_id`. Welcome may die; Cognito can still be the first hit.
 
@@ -107,7 +108,7 @@ Shared, hour 0 only, all three: `contracts/`. After that, that tree needs all th
 3. `sdk/tracevault/`: `start_span` / `end_span` around Bedrock converse + one RAG retrieve. Schema fields including tokens and `cost_usd`. `sensitive=True` hashes/masks before logs. Alexis still redacts at ingest.
 4. `demo-app/`: small corpus, retrieve, one tool, one LLM answer. Two tenant keys.
 5. `scripts/demo_pii_flight.sh`: `tenant-a`, email + fake SSN in the prompt.
-6. Terraform per **HTTP + auth**: CORS, JWT authorizer, API key ingest, `/health` mock, two Lambdas, Cognito `custom:tenant_id`, CloudFront + CSP, WAF, KMS, secrets placeholders, logs 7d, 5xx alarm. Outputs: `api_url`, `cloudfront_url`, Cognito ids/domain for `NEXT_PUBLIC_*`.
+6. Terraform per **HTTP + auth** and **Security + governance**: CORS, JWT authorizer, API key ingest, `/health` mock, two Lambdas, Cognito `custom:tenant_id`, CloudFront HTTPS-only + CSP/HSTS, WAF, KMS, secrets placeholders, logs 7d, 5xx alarm, OIDC, throttle. Outputs: `api_url`, `cloudfront_url`, Cognito ids/domain for `NEXT_PUBLIC_*`.
 7. Keep the URL alive.
 
 ### Alexis
@@ -207,6 +208,37 @@ NEXT_PUBLIC_COGNITO_DOMAIN
 ```
 
 Tokens in memory or sessionStorage. Trevor outputs these values. Michael does not hardcode URLs.
+
+---
+
+## Security + governance
+
+48h **production SaaS** on AWS. Not a SOC2 program. If a control is not in this table, do not invent it. Owners implement it in **their** tree; Trevor does not write `vault/` Python; Alexis/Michael do not write Terraform.
+
+Last year: InnerAI stored plaintext prompts; Minions/GenA11y used SSH and AKIA. We do not.
+
+### Must ship
+
+| Control | Owner | What “done” is |
+|---|---|---|
+| PII never at rest | Alexis | Presidio + deny-list (SSN, email, `AKIA`, `sk-`). Fail-closed: `redaction_failed` 400, **nothing stored**. Prompt → `prompt_hash` + masked `prompt_preview` only. |
+| Tenant isolation | Alexis + Trevor | Trevor: two Cognito users, `custom:tenant_id`, ingest keys in Secrets Manager. Alexis: JWT tenant must match stored tenant → **403 not 404**. List scoped. Tests judges can watch fail. |
+| Audit + retention | Alexis + Trevor | GET of a trace **writes** an audit row. Dynamo TTL 7d (`expires_at`). Lambda logs 7d. No raw prompts in logs (Trevor SDK `sensitive=True`; Alexis never logs the raw body). |
+| Secrets | Trevor | No secrets in git. `TF_VAR_*` / Secrets Manager. GitHub Actions **OIDC only** — if you type `AKIA`, stop. gitleaks on every PR. |
+| Encryption | Trevor | S3 + Dynamo **SSE-KMS**. In transit: CloudFront **HTTPS-only** (redirect HTTP). API Gateway HTTPS. |
+| Perimeter | Trevor | S3 **public access block** + CloudFront **OAC** (no public website endpoint). CORS origin = CloudFront URL only, not `*`. **No SSH `:22`**. WAF on the HTTP API (AWS managed common rules). API throttle (demo-sized; do not leave unlimited). |
+| IAM | Trevor | No `s3:*` / `dynamodb:*` on `*`. Ingest Put under `{tenant_id}/`. Read Get/Query only. Bedrock invoke scoped to the model ids in tfvars. OIDC role limited to this stack. |
+| Headers | Trevor | CloudFront response headers: CSP (`default-src 'self'`, `connect-src` API), **HSTS**, `X-Content-Type-Options: nosniff`. |
+| AppSec CI | Trevor YAML; Alexis/Michael tests | gitleaks, trivy, bandit, `vault.yml` isolation/SSN, Playwright 403. Deploy **`main` only**. Rollback = re-run last green `deploy.yml`. |
+| UI must not leak | Michael | Fixtures and live views never show raw SSN/email. 403 from contracted JSON. Tokens in memory or sessionStorage, not git. |
+
+Health: `GET /health` 200. Alarm: API 5xx ≥ 5 in 5 minutes. Tags on AWS resources: `Project=TraceVault`, `Env=dev|prod`.
+
+### Do not build (still)
+
+CloudTrail, GuardDuty, Security Hub, VPC-attached Lambdas, PITR, MFA on judge users, custom domain, WAF on CloudFront unless the API WAF is already green and time remains, SNS pager, AWS Config rules, SOC2 docs.
+
+Alexis/Michael: put **your** rows into `enterprise.md` when you fill the constitution. Trevor: `skills/trevor-recorder/enterprise.md` + `agents/infra.md`.
 
 ---
 
