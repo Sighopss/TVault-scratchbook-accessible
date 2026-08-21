@@ -1,8 +1,6 @@
 # TraceVault — hackathon plan
 
-**Team:** Trevor, Alexis, Michael  
-**Product:** AI Application Flight Recorder (Unified AI Observability)  
-**Rule:** Observability must not become a data-leakage mechanism. If it is not on the judge path, do not build it.
+**Theme (P-02):** Unified AI Observability. **Product:** AI Application Flight Recorder. **Team (P-01):** Trevor, Alexis, Michael (3 ≤ 5).
 
 This file is the team plan. Everything below is in here on purpose.
 
@@ -15,6 +13,7 @@ This file is the team plan. Everything below is in here on purpose.
 | Three-person work | Who builds what |
 | HTTP + auth | Routes, JWT, CORS, two Lambdas |
 | Security + governance | 48h AWS prod bar, assigned; not SOC2 |
+| Handbook | 2026 judge P-01–P-15, threat model, system card |
 | Skills format | Parallel agents, same files, your content |
 | Start | Pull → “ok let’s start”: `START.md` (Alexis/Michael fill their own skills) |
 | Tree | Product repo layout |
@@ -107,12 +106,12 @@ Same count on purpose. Vault is not a light lane — PLAN used to hide it in fou
 ### Trevor
 
 1. Product GitHub repo. Branch protection. OIDC. Copy plan + skills. Bootstrap Terraform remote state (S3 + lock) once.
-2. CI/CD (`trevor-ci`): `.github/` + `Makefile` — `gitleaks`, `trivy`, `sdk.yml`, `vault.yml`, `web.yml`, `infra.yml`, `deploy.yml`. Rollback = re-run last green deploy. Alexis/Michael do **not** author workflow YAML.
+2. CI/CD (`trevor-ci`): `.github/` + `Makefile` — `gitleaks`, `trivy`, **`make sbom`** (CycloneDX CI artifact, not secrets), `sdk.yml`, `vault.yml`, `web.yml`, `infra.yml`, `deploy.yml`. Rollback = re-run last green deploy. Alexis/Michael do **not** author workflow YAML.
 3. `sdk/tracevault/`: `start_span` / `end_span` around Bedrock converse + one RAG retrieve. Tokens + `cost_usd`. `sensitive=True` hashes/masks before logs. Alexis still redacts at ingest.
-4. `demo-app/`: small corpus, retrieve, one tool, one LLM answer. Two tenant keys.
+4. `demo-app/`: small corpus, **one** retrieve tool (allowlist — no write/delete tools), one LLM answer. Two tenant keys. Timeouts so the agent cannot loop unbounded.
 5. `scripts/demo_pii_flight.sh`: `tenant-a`, email + fake SSN in the prompt.
 6. Terraform per **HTTP + auth** and **Security + governance**: CORS, JWT, ingest key, `/health`, two Lambdas, Cognito, CloudFront HTTPS-only + headers, WAF, KMS, secrets placeholders, logs 7d, 5xx alarm, OIDC, throttle. Outputs for `NEXT_PUBLIC_*`.
-7. Keep the URL alive (re-run last green `deploy.yml` if it dies).
+7. Keep the URL alive (re-run last green `deploy.yml` if it dies). Makefile help **is** the runbook: health, tenants, rollback, where logs live. No secrets in it.
 
 ### Alexis
 
@@ -123,13 +122,13 @@ Same count on purpose. Vault is not a light lane — PLAN used to hide it in fou
 4. `vault/read/` + `vault/handlers/read.py`: `GET /v1/traces` and `GET /v1/traces/{trace_id}`. JWT `custom:tenant_id`. Mismatch → **403 not 404**. `limit` max 50.
 5. `vault/audit/`: GET detail writes a row. `GET .../audit` returns `{events:[{actor,tenant_id,trace_id,ts}]}` tenant-scoped.
 6. HTTP **error JSON** exactly (`unauthorized` / `forbidden` / `invalid` / `redaction_failed`). `message` never contains PII, prompts, or keys.
-7. Tests (VRA style, `vault.yml` runs them): SSN/email/`AKIA` never in stored JSON; tenant-a JWT cannot read tenant-b; missing auth → 401; redact fail → 400 and store not called.
+7. Tests (VRA style, `vault.yml` runs them): SSN/email/`AKIA` never in stored JSON; tenant-a JWT cannot read tenant-b; missing auth → 401; redact fail → 400 and store not called. Adversarial: prompt that tries to exfiltrate PII still has no raw PII at rest.
 
 ### Michael
 
 0. Same constitution fill as Alexis (`START.md` + `FILL-CONSTITUTION.md`). Then Impeccable: `/impeccable init` → `PRODUCT.md` (Operate), hooks on, `/impeccable shape` **before** components. Draft at the end of this section. Do not open `web/` until `PRODUCT.md` exists. Trevor does **not** write your skills. Do not write `vault/`.
 1. `PRODUCT.md` + shape: welcome, list, waterfall, audit/tenant strip (Operate, brand tokens).
-2. Welcome `/` (unauthenticated): mark, one-line what this is, Sign in → Cognito hosted UI. One route, not a campaign site.
+2. Welcome `/` (unauthenticated): mark, one-line what this is, one-line limitation (prompts stored masked, TTL 7d), Sign in → Cognito hosted UI. One route, not a campaign site.
 3. Flight list (signed in). Detail via `?trace_id=` (no dynamic `[id]`). Next.js 15, `output: 'export'`.
 4. Waterfall (parent-child, latency, tokens, `$`) + RAG hops (masked query, doc ids, scores).
 5. Audit/tenant strip: badges `REDACTED` / tenant / TTL, tenant switcher, 403 UI from contracted error JSON.
@@ -247,6 +246,130 @@ Health: `GET /health` 200. Alarm: API 5xx ≥ 5 in 5 minutes. Tags on AWS resour
 CloudTrail, GuardDuty, Security Hub, VPC-attached Lambdas, PITR, MFA on judge users, custom domain, WAF on CloudFront unless the API WAF is already green and time remains, SNS pager, AWS Config rules, SOC2 docs.
 
 Alexis/Michael: put **your** rows into `enterprise.md` when you fill the constitution. Trevor: `skills/trevor-recorder/enterprise.md` + `agents/infra.md`.
+
+---
+
+## Handbook (2026)
+
+Source: *DevOps for GenAI Hackathon 2026 Participant & Judge Guidelines*. Production path, not a screenshot demo. Grafana is still not the UI — **this product is the observability evidence** (traces + `/health` + 5xx alarm).
+
+### Problem and metrics (P-03)
+
+**Problem:** On-call cannot reconstruct one AI request (LLM, RAG, tools, cost) without the observability stack becoming a data leak.
+
+**Outcomes judges can measure:**
+
+1. Public URL; `GET /health` → `200 {"ok":true}`
+2. One flight: waterfall + hops + tokens + `$`
+3. Synthetic email/SSN in the prompt → **zero** raw PII at rest; UI `REDACTED`
+4. `tenant-b` + tenant-a `trace_id` → **403**
+
+### Participant map (P-01–P-15)
+
+| ID | Requirement | We do | Owner / evidence |
+|---|---|---|---|
+| P-01 | 1–5 members | 3 | This file |
+| P-02 | One theme | Unified AI Observability | README + this file |
+| P-03 | Problem + metrics | Four outcomes above | Judge path |
+| P-04 | Live use case | CloudFront URL | Trevor 7 |
+| P-05 | Production path | Terraform + `deploy.yml` + runbook in Makefile help | Trevor 2+6+7 |
+| P-06 | AI transparency | `AI_USAGE.md` in the **product** repo | All three append D2 |
+| P-07 | Security by design | Threat model + tests below | Alexis 7, Trevor CI, Michael 7 |
+| P-08 | Governance | System card below | This section |
+| P-09 | Tests | Functional + security + failure | `sdk.yml` `vault.yml` `web.yml` |
+| P-10 | Observability | Flights (traces), Lambda logs 7d, 5xx alarm, `cost_usd` | Product + Trevor CloudWatch |
+| P-11 | Reproducible, no secrets | Product README + `.tfvars.example` | Trevor |
+| P-12 | Responsible AI | System card: privacy, no autonomous actions, human views traces | This section |
+| P-13 | No secrets in git | gitleaks fail-closed; OIDC | Trevor 2 |
+| P-14 | Supply chain | `trivy fs` + `make sbom` (CycloneDX artifact, not committed secrets) | Trevor 2 |
+| P-15 | Demo integrity | **Demo notes** below — fixtures vs live vs fake Bedrock | All three |
+
+### Architecture (P-05)
+
+```mermaid
+flowchart LR
+  user[Judge browser]
+  cf[CloudFront HTTPS]
+  cog[Cognito hosted UI]
+  api[HTTP API + WAF]
+  ing[Lambda vault-ingest]
+  rd[Lambda vault-read]
+  s3[(S3 SSE-KMS)]
+  ddb[(Dynamo TTL 7d)]
+  demo[demo_pii_flight.sh]
+  br[Bedrock]
+  user --> cf
+  cf --> cog
+  cf --> api
+  demo --> br
+  demo -->|POST X-Tenant-Key| api
+  api --> ing
+  api --> rd
+  ing --> s3
+  ing --> ddb
+  rd --> s3
+  rd --> ddb
+```
+
+Trust boundary: ingest key ≠ user JWT. Demo tool = **retrieve-only** (allowlist of one). No write/delete tools. No SSH.
+
+### Threat model (P-07) — OWASP LLM / agentic
+
+| Threat | Mitigation | Test owner |
+|---|---|---|
+| Sensitive disclosure (prompts/PII at rest or in logs) | Fail-closed redaction; hash+mask; SDK `sensitive=True` | Alexis 7, Trevor 3 |
+| Cross-tenant read | JWT `custom:tenant_id`; **403 not 404** | Alexis 7, Michael 7 |
+| Prompt injection / instruction conflict | Schema-only ingest; one retrieve tool; still redact at rest | Alexis 7 (payload never stores attacker’s raw PII); Trevor 4 no extra tools |
+| Secrets in git / CI | gitleaks; OIDC; Secrets Manager | Trevor 2 |
+| Unlimited API / cost | API throttle; Lambda timeout; `cost_usd` on spans | Trevor 6 |
+| Unsafe agent tools | Allowlist: RAG retrieve only. No confirm-needed writes because there are no write tools | Trevor 4 |
+| Supply chain | trivy + sbom artifact | Trevor 2 |
+| Ingest down | SDK writes `sdk/.last-flight.json`, no crash | Trevor 3 |
+| Redaction fail | 400 `redaction_failed`, nothing stored | Alexis 1+7 |
+
+Red-team **show one attack** (handbook): SSN in prompt → stored JSON has no SSN. Second: tenant-b 403.
+
+### System card (P-08, P-12)
+
+| Field | Value |
+|---|---|
+| Intended use | On-call reconstructs **one** AI request |
+| Users | `tenant-a` / `tenant-b` (judges). Not end-customers’ raw prod traffic in 48h |
+| Non-goals | Grafana, fleet KPIs, autonomous remediation, RCA-via-Bedrock, custom domain |
+| Prohibited | Storing raw prompts/PII; cross-tenant peek; AKIA in git |
+| Risk | **High** if prompts persist → fail-closed redaction is the control |
+| Data | Synthetic demo PII only. Sources: demo prompt + Bedrock output. Retention **7d TTL**. Permitted use: reconstruct that flight |
+| Human oversight | Humans view traces. No agent changes infra. Escalation: Trevor re-runs last green `deploy.yml`. No pager (48h non-goal) |
+| Transparency | UI: `REDACTED`, model name, tokens, `$`, TTL. Welcome: one-line limitation (masked prompts, 7d) |
+| Model/provider | Amazon Bedrock Claude **or** Nova, `us-east-1`. Exact id in tfvars / `BEDROCK_MODEL_ID` — record in `AI_USAGE.md` |
+| Monitoring | `/health`, API 5xx alarm, flights in Explorer |
+| Change | Feature PR; Trevor merges; `contracts/` needs all three |
+| Incident | Redaction fail = nothing stored. Site down = rollback `deploy.yml`. Compromised key = rotate Secrets Manager (Trevor) |
+
+### Demo notes (P-15)
+
+| Piece | Live | Stub |
+|---|---|---|
+| CloudFront, Cognito, API, KMS, Dynamo, S3 | Live after apply | — |
+| Presidio on ingest | Live | — |
+| Bedrock | Live unless `TRACEVAULT_FAKE_BEDROCK=1` | **Say so** if fake |
+| Explorer Day 1 | — | Full-flight **fixtures** (say so) |
+| Explorer Day 2 | `GET /v1/traces*` | — |
+
+### Submission pack (D2 PM — do not skip)
+
+Handbook §6. Owners copy into the **product** repo README:
+
+1–3, 20: name, theme, pitch, problem, roster — **PLAN** (this file)  
+4: architecture — mermaid above  
+5–6: URL + product GitHub — Trevor  
+7–8: tech + `AI_USAGE.md` — all three  
+9–10: this threat model + Alexis/Trevor/Michael tests  
+11: system card above  
+12–16: GHA green, gitleaks, trivy/sbom artifact  
+17: Makefile help = runbook  
+18: judge path live  
+19: limitations = Do-not-build list  
 
 ---
 
@@ -388,7 +511,7 @@ Ours: GitHub Actions + **OIDC** (no AKIA). Deploy **`main` only**. Rollback = re
 | D1 PM | **6** CORS + two Lambdas | **1+5** Presidio wired + audit GET | **5** Cost + tenant switcher + 403 chrome |
 | Night | **2+7** `deploy.yml`: `/health`, alarm | **7** Isolation tests (403/SSN/401) | **7** Harden 403/empty; export build |
 | D2 AM | URL + web sync + two users | Live S3 leak tests (still **7**) | **6–7** Live API + Playwright 403 |
-| D2 PM | URL alive; re-run last green `deploy.yml` | Judge governance Qs (her tests) | Click-through |
+| D2 PM | URL alive; rollback drill; `AI_USAGE.md` | Judge governance + adversarial test evidence | Click-through; welcome limitation line |
 
 ---
 

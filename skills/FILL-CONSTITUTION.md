@@ -40,6 +40,7 @@ Copy **every file** from `skills/lane-constitution/` to `skills/<your-lane>/`. K
 | `PLAN.md` **your named section** (Alexis or Michael) | write paths, numbered work, tests you owe |
 | `PLAN.md` HTTP + auth | routes, error JSON, two Lambdas vs Explorer env — **only the rows you implement** |
 | `PLAN.md` **Security + governance** | your rows only (Alexis: redaction/403/audit; Michael: no PII on screen) |
+| `PLAN.md` **Handbook (2026)** | P-01–P-15, threat model, system card, demo notes — extract **your** tests/disclosures |
 | `PLAN.md` Stack / Tree / Git / Prep / 48h table **your column** | runtime, CODEOWNERS, prep, hour windows |
 | `PLAN.md` Look + `assets/tracevault-explorer-sample.png` | Michael only |
 | `contracts/http.draft.md` | same HTTP until hour 0 copies it to `http.md` |

@@ -5,7 +5,7 @@
 **Depends on:** `sdk/` import `tracevault` (if SDK is missing, stub the import behind a `DemoEmitter` protocol and leave a handoff).  
 **Read:** `PLAN.md`, `SKILL.md`, this file, `agents/sdk.md` (do not edit sdk).
 
-You are building the **instrumented RAG/agent** that generates a real flight. It is not a product. Judges never use it except via `scripts/demo_pii_flight.sh`.
+You are building the **instrumented RAG/agent** that generates a real flight. It is not a product. Judges never use it except via `scripts/demo_pii_flight.sh`. **One tool only** (`get_doc_metadata` / retrieve). No write, delete, or shell tools. If `TRACEVAULT_FAKE_BEDROCK=1`, say so in `demo-app/README.md` (handbook P-15).
 
 ## Goal
 
