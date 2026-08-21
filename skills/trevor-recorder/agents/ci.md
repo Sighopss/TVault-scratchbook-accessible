@@ -25,9 +25,9 @@ Makefile
 
 ## Makefile (Unix)
 
-Targets: `test` (sdk pytest if `sdk/` exists), `vault` (pytest in `vault/` if exists), `web` (echo skip until `web/` exists), `demo` (`scripts/demo_pii_flight.sh` or skip), `plan` (`terraform plan` if `infra/` exists), `fmt`, `redact-check` (alias of `vault`).
+Targets: `test` (sdk pytest if `sdk/` exists), `vault` (pytest in `vault/` if exists), `web` (echo skip until `web/` exists), `demo` (`scripts/demo_pii_flight.sh` or skip), `plan` (`terraform plan` if `infra/` exists), `fmt`, `redact-check` (alias of `vault`), `sbom` (`trivy fs --format cyclonedx` when trivy exists — CI artifact, do not commit secrets).
 
-Jobs skip cleanly if the directory is missing (greenfield). No PowerShell. No `make windows-*`.
+Jobs skip cleanly if the directory is missing (greenfield). No PowerShell. No `make windows-*`. `help` target is the **runbook** (health URL, rollback = re-run last green deploy, no passwords).
 
 ## CODEOWNERS
 
@@ -37,7 +37,7 @@ Copy the block from [ownership.md](../ownership.md).
 
 **gitleaks.yml** — every PR and `main`. Fail closed.
 
-**trivy.yml** — `trivy fs .` every PR.
+**trivy.yml** — `trivy fs .` every PR. Also emit CycloneDX (`make sbom` or equivalent) as a workflow artifact (P-14). Do not commit the SBOM if it would contain secrets.
 
 **sdk.yml** — `sdk/**` `demo-app/**` `contracts/**`: Python 3.12, `uv`, `pytest`, `bandit -r sdk`.
 
