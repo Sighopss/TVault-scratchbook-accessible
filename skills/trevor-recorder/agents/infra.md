@@ -46,14 +46,15 @@ Terraform >= 1.9. AWS provider ~> 5. Region default `us-east-1`.
   - `POST /v1/traces` → `vault-ingest`, API key / `X-Tenant-Key` (see `contracts/http.draft.md`)
   - `GET /v1/traces`, `GET /v1/traces/{trace_id}`, `GET /v1/traces/{trace_id}/audit` → `vault-read`, Cognito JWT authorizer
   - WAF AWS managed common rule set
-- Two Lambdas: `vault-ingest`, `vault-read`. Package `../vault` when that tree exists; otherwise empty stub so `validate` still runs. Env: `TABLE`, `BUCKET`, `KEY_ARN`, secret ARNs. You do not write Python.
-- IAM: no `s3:*` on `*`. Ingest can PutObject under tenant prefix. Read can GetItem/Query + GetObject.
-- Cognito: user pool, app client, hosted UI domain, callback/logout = CloudFront URL, groups `viewer`/`admin`, users `tenant-a`/`tenant-b` with `custom:tenant_id` matching username. Passwords via `TF_VAR_*` not git.
-- CloudFront: default root object, 403/404 → `/index.html` (static export), response headers CSP (default-src self, connect-src API URL).
+  - Throttle (set a demo cap in tfvars; not unlimited)
+- CloudFront: default root object, 403/404 → `/index.html` (static export), **HTTPS-only** (viewer redirect), response headers: CSP (default-src self, connect-src API URL), **HSTS**, `X-Content-Type-Options: nosniff`. OAC to web bucket.
 - GitHub OIDC role limited to this stack
 - Secrets Manager: `tenant-a` and `tenant-b` ingest keys (placeholder objects)
 - CloudWatch: Lambda log groups retention 7 days. Alarm: API 5xx count ≥ 5 in 5 minutes. SNS optional — skip if no email in tfvars.
-- CloudTrail: skip (48h non-goal)
+- IAM: no `s3:*` / `dynamodb:*` / `bedrock:*` on `*`. Ingest PutObject under tenant prefix. Read GetItem/Query + GetObject. Bedrock `InvokeModel` scoped to model ids in tfvars. OIDC role limited to this stack.
+- Two Lambdas: `vault-ingest`, `vault-read`. Package `../vault` when that tree exists; otherwise empty stub so `validate` still runs. Env: `TABLE`, `BUCKET`, `KEY_ARN`, secret ARNs. You do not write Python.
+- Cognito: user pool, app client, hosted UI domain, callback/logout = CloudFront URL, groups `viewer`/`admin`, users `tenant-a`/`tenant-b` with `custom:tenant_id` matching username. Passwords via `TF_VAR_*` not git.
+- Tags: `Project=TraceVault`, `Env` from workspace.
 
 ## Outputs
 
@@ -65,7 +66,7 @@ Terraform >= 1.9. AWS provider ~> 5. Region default `us-east-1`.
 
 ## Do not
 
-SSH `:22`. EKS. OpenSearch. Secrets in `*.tf`. Edit `vault/` Python. Apply unprompted. Five Lambdas. Cognito on ingest.
+SSH `:22`. EKS. OpenSearch. Secrets in `*.tf`. Edit `vault/` Python. Apply unprompted. Five Lambdas. Cognito on ingest. CloudTrail, GuardDuty, VPC-for-Lambda, Cognito MFA.
 
 ## Done
 
