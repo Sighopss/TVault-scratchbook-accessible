@@ -19,7 +19,7 @@ gh pr view <N>
 
 Read **Claimed paths** in each PR body / `handoffs/*.md`. If they overlap **your** write paths → **do not write**. Say you are blocked. Do not “just edit the same file.”
 
-4. Claim: copy [`PR.example.md`](PR.example.md) → `handoffs/<your-name>-<id>-<slug>.md` on **your** branch. Paths in that file are now claimed. Open the PR. **Do not merge** — Trevor merges.
+4. Claim: copy [`PR.example.md`](PR.example.md) → `handoffs/<your-name>-<id>-<slug>.md` on **your** branch. Fill **Handbook evidence** (stage, P-ids, rubric, tests, stub/live). Empty evidence = incomplete. Open the PR. **Do not merge** — Trevor merges.
 
 Two agents, two worktrees, two PRs. Trevor merging `main` is the integrate step.
 

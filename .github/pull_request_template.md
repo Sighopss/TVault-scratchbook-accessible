@@ -9,6 +9,11 @@ Paste that file’s body under this heading (required for other LLMs):
 ```
 ```
 
+## Handbook (required)
+
+- [ ] Handoff has **Handbook evidence** (stage, P-ids, rubric rows, tests, stub vs live)
+- [ ] I did not skip the PLAN Cycle gate (no Build before hour 0 Design)
+
 ## Collision
 
 - [ ] I listed **Claimed paths** (prefixes I will write)

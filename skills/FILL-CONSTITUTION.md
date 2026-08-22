@@ -40,7 +40,7 @@ Copy **every file** from `skills/lane-constitution/` to `skills/<your-lane>/`. K
 | `PLAN.md` **your named section** (Alexis or Michael) | write paths, numbered work, tests you owe |
 | `PLAN.md` HTTP + auth | routes, error JSON, two Lambdas vs Explorer env — **only the rows you implement** |
 | `PLAN.md` **Security + governance** | your rows only (Alexis: redaction/403/audit; Michael: no PII on screen) |
-| `PLAN.md` **Handbook (2026)** | P-01–P-15, threat model, system card, demo notes — extract **your** tests/disclosures |
+| `PLAN.md` **Handbook (2026)** | P-01–P-15, **Cycle gates**, **Rubric 100**, threat model, system card — extract **your** tests/disclosures; every later PR fills Handbook evidence |
 | `PLAN.md` Stack / Tree / Git / Prep / 48h table **your column** | runtime, CODEOWNERS, prep, hour windows |
 | `PLAN.md` Look + `assets/tracevault-explorer-sample.png` | Michael only |
 | `contracts/http.draft.md` | same HTTP until hour 0 copies it to `http.md` |
@@ -104,10 +104,10 @@ Do not implement application code in the same first pass unless the human said t
 
 Every session:
 
-1. `START.md` → `PLAN.md` → `handoffs/README.md` → `gh pr list --state open` (stop if claimed paths overlap) → your `SKILL.md` → one mission (or this fill file if still incomplete).
+1. `START.md` → `PLAN.md` (**Handbook Cycle** — which stage?) → `handoffs/README.md` → `gh pr list --state open` (stop if claimed paths overlap) → your `SKILL.md` → one mission (or this fill file if still incomplete). Do not Build if Design (hour 0) is unlocked.
 2. Do the work.
-3. **Write back** into the constitution: tick workflow, append `progress.md`, add learned env/paths to `stack.md`.
-4. Commit `handoffs/<your-name>-<id>-<slug>.md` on the PR (copy `handoffs/PR.example.md`). Paste it in the PR body.
+3. **Write back** into the constitution: tick workflow, append `progress.md` (include lifecycle stage + rubric rows), add learned env/paths to `stack.md`.
+4. Commit `handoffs/<your-name>-<id>-<slug>.md` on the PR (copy `handoffs/PR.example.md`). Fill **Handbook evidence**. Paste it in the PR body.
 
 That is the loop. Chat is not the system of record.
 
@@ -119,3 +119,4 @@ That is the loop. Chat is not the system of record.
 - Merge to `main` (Trevor merges). Commit only if the human asked.
 - Start long-running servers. Put secrets in git.
 - Skip `gh pr list` / skip the per-PR `handoffs/*.md` file.
+- Skip **Handbook evidence** on the PR handoff.

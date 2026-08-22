@@ -6,7 +6,7 @@
 **Product:** TraceVault — AI Application Flight Recorder  
 **Team:** Trevor, Alexis, Michael (3)
 
-Application code goes in a separate repo Trevor creates — see [PLAN.md](PLAN.md). Handbook map: PLAN **Handbook (2026)**.
+Application code goes in a separate repo Trevor creates — see [PLAN.md](PLAN.md). Scoring: PLAN **Handbook (2026)** Cycle + Rubric 100. Every PR: Handbook evidence on the handoff.
 
 ## Humans
 

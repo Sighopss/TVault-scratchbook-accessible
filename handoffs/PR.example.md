@@ -25,6 +25,16 @@ If another open PR lists an overlapping path, they must not write. You must not 
 
 Agents whose claimed paths do **not** overlap this list. Name them if you know (`trevor-infra` vs `alexis-redact`, not “everyone”).
 
+## Handbook evidence (required — 2026 workbook)
+
+Empty = incomplete PR. Copy from PLAN **Rubric 100** / P-ids.
+
+- Lifecycle stage: `<Discover|Design|Build|Validate|Deploy|Operate|Govern>`
+- P-ids this PR moves: `<e.g. P-09, P-13>`
+- Rubric rows (pts): `<e.g. Security 15, DevOps 10>`
+- Tests / attack shown:
+- Stub/live (P-15):
+
 ## What I shipped
 
 - files:

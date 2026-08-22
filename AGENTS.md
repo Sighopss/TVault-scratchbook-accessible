@@ -8,7 +8,7 @@ You are an LLM coding agent. Do not invent a second product. Grafana is not the 
 
 1. `START.md` if the human said let’s start (or first clone)
 2. `README.md`
-3. `PLAN.md`
+3. `PLAN.md` — including **Handbook Cycle** and **Rubric 100** (every session)
 4. `handoffs/README.md` then `gh pr list --state open` (stop on claimed-path overlap)
 5. `contracts/http.draft.md`
 6. `skills/INDEX.md`
@@ -28,7 +28,7 @@ You are trevor-sdk.
 Read PLAN.md, handoffs/README.md, and skills/trevor-recorder/SKILL.md.
 gh pr list --state open. If claimed paths overlap yours, stop.
 Execute skills/trevor-recorder/agents/sdk.md only.
-Commit handoffs/trevor-sdk-<slug>.md on this PR.
+Commit handoffs/<name>-<id>-<slug>.md on this PR with Handbook evidence.
 Do not commit unless I ask. Do not merge to main — Trevor merges feature branches. Do not edit vault/ or web/.
 Do not fill Alexis or Michael constitutions.
 ```

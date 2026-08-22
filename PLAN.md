@@ -13,7 +13,8 @@ This file is the team plan. Everything below is in here on purpose.
 | Three-person work | Who builds what |
 | HTTP + auth | Routes, JWT, CORS, two Lambdas |
 | Security + governance | 48h AWS prod bar, assigned; not SOC2 |
-| Handbook | 2026 judge P-01–P-15, threat model, system card |
+| Handbook | 2026 P-01–P-15, threat model, system card |
+| Cycle + rubric | Discover→Govern gates; 100-pt evidence every PR |
 | Skills format | Parallel agents, same files, your content |
 | Start | Pull → “ok let’s start”: `START.md` (Alexis/Michael fill their own skills) |
 | Tree | Product repo layout |
@@ -371,6 +372,41 @@ Handbook §6. Owners copy into the **product** repo README:
 18: judge path live  
 19: limitations = Do-not-build list  
 
+### Cycle (handbook §2) — do not skip a gate
+
+Every session: name the **stage**. Do not start Build before Design is locked. Do not pitch without Operate + Govern evidence.
+
+| Stage | When | Gate (must be true before next) | Who |
+|---|---|---|---|
+| **Discover** | −1 | Problem + 4 metrics + data sensitivity (synthetic PII) written | All (this file) |
+| **Design** | Hour 0 | `contracts/http.md` + `span.schema.json` + full-flight fixtures + threat model (this file) | All three in the thread |
+| **Build** | D1 | Only **your** 7 tasks. One mission, one PR, handbook evidence on the handoff | Lane owner |
+| **Validate** | D1 night | Functional + security + failure tests green on the PR (`sdk.yml` / `vault.yml` / `web.yml`) | Tests: lane; YAML: Trevor |
+| **Deploy** | Night / D2 | `deploy.yml` on `main` only; gitleaks + trivy + sbom artifact; rollback documented | Trevor 2+7 |
+| **Operate** | D2 AM | Live URL; `/health`; 5xx alarm; Explorer shows a flight; Makefile help = runbook | Trevor + Michael |
+| **Govern** | D2 PM | System card (this file) + `AI_USAGE.md` + demo notes (fixtures vs live) + show-one-attack | All three |
+
+### Rubric 100 — evidence per category
+
+Judges score **evidence**, not slides. Each PR handoff names which rows it moves. Tie-breakers if close: (1) production/ops (2) security/AI-risk (3) user impact.
+
+| Pts | Category | How we score it | Evidence | Red flag we refuse |
+|---|---|---|---|---|
+| 15 | Problem & Impact | Four metrics on the judge path | This file + live click-through | Tech demo with no outcome |
+| 10 | Innovation | Governed Flight Recorder vs InnerAI plaintext / Minions Grafana | Winners steal + REDACTED + 403 | Wrapper + KPI wall |
+| 15 | Engineering | One schema, two Lambdas, Next export, Bedrock RAG | Tree + architecture mermaid | Undisclosed mocks |
+| 10 | DevOps | OIDC, path CI, IaC, `main`-only deploy, rollback | GHA green + Makefile help | SSH, AKIA, deploy every push |
+| 15 | Security | Threat model + attack tests + cloud controls | Alexis 7 + gitleaks/trivy/WAF/KMS | “We’re secure” with no test |
+| 10 | AI Governance | System card, TTL, human views traces, no write-tools | Handbook system card + audit GET | No owner / no escalation |
+| 10 | Reliability & Observability | Traces **are** the product; 5xx alarm; ingest-down fallback; rollback | Explorer + `/health` + `.last-flight.json` | No plan after deploy |
+| 5 | Usability | Welcome → sign-in → waterfall | Judge path; Playwright | Screenshot-only |
+| 5 | Presentation | 3-min path; say stubs (P-15) | Live demo + demo notes | Grafana backup slide |
+| 5 | Team & AI-tool | Feature PRs, handoffs, Trevor merges, `AI_USAGE.md` | Git + this process | Mystery Copilot, no roster |
+
+**Scale (judge ask):** bottleneck is ingest Lambda + Bedrock; 10x = raise throttle/concurrency in tfvars — not EKS. **Failure demo:** SSN at rest fails the test; tenant-b 403; re-run last green deploy.
+
+Every feature PR: fill **Handbook evidence** on `handoffs/PR.example.md`. If that section is empty, the PR is incomplete.
+
 ---
 
 ## Skills format
@@ -451,7 +487,7 @@ skills/<michael-lane>/
 
 `main` protected. Feature branch + PR. Humans: `alexis/<slug>`, `michael/<slug>`, `trevor/<slug>`. Trevor agents: `trevor/<id>/<slug>`. **Only Trevor merges.** Schema/`http.md` PRs: all three in the thread. No push to `main`. No deploy from feature branches. No CodePipeline. No per-PR stacks.
 
-Every PR: committed `handoffs/<name>-<id>-<slug>.md` + same text in the PR body ([`.github/pull_request_template.md`](.github/pull_request_template.md)). Collision = claimed-path overlap with an **open** PR, or local lease overlap.
+Every PR: committed `handoffs/<name>-<id>-<slug>.md` + same text in the PR body ([`.github/pull_request_template.md`](.github/pull_request_template.md)). **Handbook evidence** required (stage, P-ids, rubric, tests, stub/live). Collision = claimed-path overlap with an **open** PR, or local lease overlap.
 
 ### What last year actually ran (steal OS, not their deploy)
 
@@ -503,15 +539,15 @@ Ours: GitHub Actions + **OIDC** (no AKIA). Deploy **`main` only**. Rollback = re
 
 ## 48h table
 
-| Window | Trevor | Alexis | Michael |
-|---|---|---|---|
-| −1 | Repo, OIDC, empty CI | Skills + Presidio hello-world + deny-list | Skills + Impeccable init + PRODUCT shape |
-| 0 | Schema + http.md; callback URL | **1 redact** cases on contract | Fixture wireframe; `NEXT_PUBLIC_*` names |
-| D1 AM | **3–4** SDK + demo emit | **2–3** store + ingest handler | **2–4** Welcome + list + waterfall on fixtures |
-| D1 PM | **6** CORS + two Lambdas | **1+5** Presidio wired + audit GET | **5** Cost + tenant switcher + 403 chrome |
-| Night | **2+7** `deploy.yml`: `/health`, alarm | **7** Isolation tests (403/SSN/401) | **7** Harden 403/empty; export build |
-| D2 AM | URL + web sync + two users | Live S3 leak tests (still **7**) | **6–7** Live API + Playwright 403 |
-| D2 PM | URL alive; rollback drill; `AI_USAGE.md` | Judge governance + adversarial test evidence | Click-through; welcome limitation line |
+| Window | Stage | Trevor | Alexis | Michael |
+|---|---|---|---|---|
+| −1 | Discover | Repo, OIDC, empty CI | Skills + Presidio hello-world + deny-list | Skills + Impeccable init + PRODUCT shape |
+| 0 | **Design gate** | Schema + http.md; callback URL | **1 redact** cases on contract | Fixture wireframe; `NEXT_PUBLIC_*` names |
+| D1 AM | Build | **3–4** SDK + demo emit | **2–3** store + ingest handler | **2–4** Welcome + list + waterfall on fixtures |
+| D1 PM | Build | **6** CORS + two Lambdas | **1+5** Presidio wired + audit GET | **5** Cost + tenant switcher + 403 chrome |
+| Night | Validate → Deploy | **2+7** `deploy.yml`: `/health`, alarm | **7** Isolation tests (403/SSN/401) | **7** Harden 403/empty; export build |
+| D2 AM | Operate | URL + web sync + two users | Live S3 leak tests (still **7**) | **6–7** Live API + Playwright 403 |
+| D2 PM | Govern | URL alive; rollback drill; `AI_USAGE.md` | Judge governance + adversarial test evidence | Click-through; welcome limitation line |
 
 ---
 
