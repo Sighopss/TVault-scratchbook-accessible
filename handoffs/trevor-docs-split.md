@@ -50,10 +50,3 @@ nobody
 ## Contract reminder
 
 Still no Grafana, CloudTrail, VPC, MFA. Observability evidence = Flight Recorder + /health + 5xx.
-
-## Pickup prompt (paste into the other LLM)
-
-```
-Read PLAN.md Three-person work and Handbook (2026).
-Seven tasks each. Do not merge to main — Trevor merges.
-```

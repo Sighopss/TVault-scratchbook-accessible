@@ -54,12 +54,3 @@ Empty = incomplete PR. Copy from PLAN **Rubric 100** / P-ids.
 ## Contract reminder
 
 `<only the interface you own — not another lane’s internals>`
-
-## Pickup prompt (paste into the other LLM)
-
-```
-Read this handoff, scratchbook PLAN.md, and JUDGE.md.
-Do not edit the claimed paths above.
-Continue your own mission using What I shipped.
-Do not merge to main — Trevor merges.
-```

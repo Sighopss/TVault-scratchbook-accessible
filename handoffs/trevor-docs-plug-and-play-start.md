@@ -62,12 +62,3 @@ nobody
 ## Contract reminder
 
 Scratchpad is not the product repo. No `sdk/` `vault/` `web/` here.
-
-## Pickup prompt (paste into the other LLM)
-
-```
-Read this handoff, START.md, PLAN.md, handoffs/README.md.
-Do not edit the claimed paths above unless you are on this same docs PR.
-If you are Alexis or Michael: FILL-CONSTITUTION.md, then your own handoff files on your PRs.
-Do not merge to main — Trevor merges.
-```
