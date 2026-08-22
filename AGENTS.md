@@ -9,11 +9,12 @@ You are an LLM coding agent. Do not invent a second product. Grafana is not the 
 1. `START.md` if the human said let’s start (or first clone)
 2. `README.md`
 3. `PLAN.md` — including **Handbook Cycle** and **Rubric 100** (every session)
-4. `handoffs/README.md` then `gh pr list --state open` (stop on claimed-path overlap)
-5. `contracts/http.draft.md`
-6. `skills/INDEX.md`
-7. **Trevor:** `skills/trevor-recorder/SKILL.md` then **one** `agents/{sdk,demo,scripts,infra,ci}.md`
-8. **Alexis / Michael:** `skills/FILL-CONSTITUTION.md` until their constitution exists and has no placeholders; then their `SKILL.md` + one mission
+4. `JUDGE.md` — never-kill + click path. Product-repo sessions: load from this scratchbook, do not copy the files over.
+5. `handoffs/README.md` then `gh pr list --state open` (stop on claimed-path overlap)
+6. `contracts/http.draft.md`
+7. `skills/INDEX.md`
+8. **Trevor:** `skills/trevor-recorder/SKILL.md` then **one** `agents/{sdk,demo,scripts,infra,ci}.md`
+9. **Alexis / Michael:** `skills/FILL-CONSTITUTION.md` until their constitution exists and has no placeholders; then their `SKILL.md` + one mission
 
 Every PR: commit `handoffs/<name>-<id>-<slug>.md` and paste it in the PR body. Trevor does not write Alexis or Michael skills.
 
@@ -25,7 +26,7 @@ See `START.md`. After they have a folder, they add **their** id pastes below (sa
 
 ```
 You are trevor-sdk.
-Read PLAN.md, handoffs/README.md, and skills/trevor-recorder/SKILL.md.
+Read PLAN.md, JUDGE.md, handoffs/README.md, and skills/trevor-recorder/SKILL.md.
 gh pr list --state open. If claimed paths overlap yours, stop.
 Execute skills/trevor-recorder/agents/sdk.md only.
 Commit handoffs/<name>-<id>-<slug>.md on this PR with Handbook evidence.

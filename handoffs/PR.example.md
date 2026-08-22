@@ -34,6 +34,7 @@ Empty = incomplete PR. Copy from PLAN **Rubric 100** / P-ids.
 - Rubric rows (pts): `<e.g. Security 15, DevOps 10>`
 - Tests / attack shown:
 - Stub/live (P-15):
+- Judge bar (`JUDGE.md`): never-kill still intact / named break + owner:
 
 ## What I shipped
 
@@ -57,7 +58,7 @@ Empty = incomplete PR. Copy from PLAN **Rubric 100** / P-ids.
 ## Pickup prompt (paste into the other LLM)
 
 ```
-Read this handoff and PLAN.md.
+Read this handoff, scratchbook PLAN.md, and JUDGE.md.
 Do not edit the claimed paths above.
 Continue your own mission using What I shipped.
 Do not merge to main — Trevor merges.

@@ -8,9 +8,10 @@ Do not invent a second product. Grafana is not the UI. **Only Trevor merges** to
 
 1. This file
 2. `PLAN.md` — product, judge path, HTTP + auth, **Handbook Cycle + Rubric 100**, **the named section for this human**
-3. `handoffs/README.md` — per-PR handoff + collision. Then `gh pr list --state open` before any write.
-4. `contracts/http.draft.md` until `contracts/http.md` exists
-5. `skills/INDEX.md`
+3. `JUDGE.md` — click path, never-kill, P-15. If you are in the **product** repo, still read these two files from this scratchbook. Do not create them there.
+4. `handoffs/README.md` — per-PR handoff + collision. Then `gh pr list --state open` before any write.
+5. `contracts/http.draft.md` until `contracts/http.md` exists
+6. `skills/INDEX.md`
 
 Then branch on who they are.
 
@@ -71,7 +72,7 @@ Update my progress.md before you stop. Do not merge to main — Trevor merges.
 
 ```
 I am Trevor. Ok let's start.
-Read START.md, PLAN.md (Handbook Cycle + Rubric 100), handoffs/README.md, then skills/trevor-recorder/SKILL.md and one agents/*.md.
+Read START.md, PLAN.md (Handbook Cycle + Rubric 100), JUDGE.md, handoffs/README.md, then skills/trevor-recorder/SKILL.md and one agents/*.md.
 gh pr list --state open. If claimed paths overlap yours, stop.
 Commit handoffs/<id>-<slug>.md on the PR (copy handoffs/PR.example.md) including Handbook evidence.
 Do not fill Alexis or Michael constitutions. Do not edit vault/ or web/.

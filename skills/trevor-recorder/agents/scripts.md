@@ -4,7 +4,7 @@
 **Write:** `scripts/` only  
 **Depends on:** `demo-app` entrypoint.
 
-You own the **judge button**. One command must reproduce the PII flight.
+You own the **judge button** (`JUDGE.md` step 5). One command must reproduce the PII flight. Do not invent a second demo entry.
 
 ## Files to create
 

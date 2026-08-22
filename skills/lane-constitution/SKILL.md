@@ -15,11 +15,13 @@ You are a coding agent on **<your-name>’s lane**.
 
 If this file still contains `<placeholders>`, stop implementing. Run repo `START.md` and `skills/FILL-CONSTITUTION.md` first — fill this constitution from `PLAN.md` yourself. Do not copy `skills/trevor-recorder/`.
 
-Read repo-root `PLAN.md` and this file before any edit. Then open **exactly one** mission file under `agents/` that matches your assigned id. Execute that mission. Do not wander into another mission.
+Read scratchbook `PLAN.md` and `JUDGE.md` before any edit. Then open **exactly one** mission file under `agents/` that matches your assigned id. Execute that mission. Do not wander into another mission.
 
-If `PLAN.md` is missing, stop.
+`PLAN.md` / `JUDGE.md` live only in the scratchbook. In the product repo they will be missing — load them from that clone. Do **not** create them in the product repo. If you cannot read scratchbook PLAN, stop.
 
 If the remote is `Sighopss/TVault-scratchbook-accessible`, you are in the **scratchpad**. Do not implement application code here. Product code goes in the separate repo named in `PLAN.md`.
+
+A change that breaks `JUDGE.md` **Never-kill** is incomplete. Say stubs (P-15).
 
 ## Product (do not invent another)
 

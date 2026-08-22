@@ -1,6 +1,6 @@
 # Workflow
 
-1. Read `PLAN.md` (Handbook Cycle + your mission).
+1. Read scratchbook `PLAN.md` (Handbook Cycle + your mission) and `JUDGE.md`. Do not copy them into the product repo. Do not break Never-kill.
 2. Read `skills/trevor-recorder/SKILL.md`.
 3. Read **one** `agents/*.md` matching your id.
 4. Lease paths **and** open PRs (`handoffs/README.md`). Stop on overlap.

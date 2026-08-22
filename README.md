@@ -6,7 +6,7 @@
 **Product:** TraceVault — AI Application Flight Recorder  
 **Team:** Trevor, Alexis, Michael (3)
 
-Application code goes in a separate repo Trevor creates — see [PLAN.md](PLAN.md). Scoring: PLAN **Handbook (2026)** Cycle + Rubric 100. Every PR: Handbook evidence on the handoff.
+Application code goes in a separate repo Trevor creates — see [PLAN.md](PLAN.md). Do **not** copy PLAN / [JUDGE.md](JUDGE.md) / skills-as-docs into that repo. Scoring stays here: PLAN **Handbook (2026)** + **JUDGE.md**. Every product PR still names Handbook evidence. Design and code must not break the judge never-kill list.
 
 ## Humans
 
@@ -21,8 +21,9 @@ Open [PLAN.md](PLAN.md) for the three-person product plan.
 3. [handoffs/README.md](handoffs/README.md) — one handoff file per PR; `gh pr list` before write
 4. [AGENTS.md](AGENTS.md) — paste blocks once a lane exists
 5. [PLAN.md](PLAN.md) — product, fences, 48h SaaS bar
-6. [contracts/http.draft.md](contracts/http.draft.md) — HTTP + auth (hour 0 lock)
-7. [skills/INDEX.md](skills/INDEX.md)
+6. [JUDGE.md](JUDGE.md) — click path, four metrics, never-kill, P-15
+7. [contracts/http.draft.md](contracts/http.draft.md) — HTTP + auth (hour 0 lock)
+8. [skills/INDEX.md](skills/INDEX.md)
 
 **Trevor:** [skills/trevor-recorder/SKILL.md](skills/trevor-recorder/SKILL.md) then **one** mission under [skills/trevor-recorder/agents/](skills/trevor-recorder/agents/).
 

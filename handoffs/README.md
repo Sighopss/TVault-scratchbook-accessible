@@ -8,7 +8,7 @@ Do not invent routes. After hour 0, HTTP is `contracts/http.md`.
 
 ## Collision check (before any write)
 
-1. PLAN.md write paths for **your** human. If the task is another lane, stop.
+1. Scratchbook PLAN.md write paths for **your** human. If the task is another lane, stop. Also `JUDGE.md` — do not break Never-kill. Do not add PLAN/JUDGE to the product repo.
 2. Local lease: `.agent-leases.json` (gitignored). Overlap + started < 4h → stop. Do not delete someone else’s lease.
 3. **Open PRs** (other machines):
 
@@ -37,7 +37,7 @@ After merge, the file stays on `main` as history. Do not rewrite another PR’s 
 ## Pickup (other LLM)
 
 ```
-Read PLAN.md, START.md, and handoffs/README.md.
+Read scratchbook PLAN.md, JUDGE.md, START.md, and handoffs/README.md.
 gh pr list --state open
 gh pr view <N>
 Use only What I shipped / outputs. Do not edit Claimed paths.

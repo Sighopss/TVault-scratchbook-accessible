@@ -2,12 +2,12 @@
 
 **Theme (P-02):** Unified AI Observability. **Product:** AI Application Flight Recorder. **Team (P-01):** Trevor, Alexis, Michael (3 ≤ 5).
 
-This file is the team plan. Everything below is in here on purpose.
+This file is the team plan. Everything below is in here on purpose. **Judge click-path + never-kill:** [`JUDGE.md`](JUDGE.md). Design and coding must stay sensitive to that bar.
 
 | Section | What it is |
 |---|---|
 | Done-bar | 48h production SaaS yes/no |
-| Judge path | What judges click |
+| Judge path | What judges click (`JUDGE.md` is the short bar) |
 | Winners steal | What we copy from last year |
 | Stack | Languages, AWS, brand tokens |
 | Three-person work | Who builds what |
@@ -27,7 +27,7 @@ This file is the team plan. Everything below is in here on purpose.
 
 **This GitHub repo is a scratchpad.** `https://github.com/Sighopss/TVault-scratchbook-accessible` is plan, brand, and skills. No `sdk/`, `vault/`, `web/`, `infra/`, or deploy here. After clone, humans tell their LLM “ok let’s start” — [`START.md`](START.md). Alexis and Michael **fill their own** constitutions ([`skills/FILL-CONSTITUTION.md`](skills/FILL-CONSTITUTION.md)); Trevor does not write those folders.
 
-**Product repo:** Trevor creates a new GitHub repo. That is the only app. Copy this plan + skills into it. Git/CI rules apply **there**.
+**Product repo:** Trevor creates a new GitHub repo. That is the only app. Do **not** copy this PLAN, `JUDGE.md`, Handbook, START, or skills-as-docs into it. Agents on product code still **read** PLAN + JUDGE from this scratchbook. Git/CI rules apply **there**. Thin product README (name, theme, URL) is fine. `AI_USAGE.md` stays a D2 product-repo evidence file, not this plan.
 
 Hour 0 also writes `contracts/http.md` by copying **HTTP + auth** below, and `contracts/span.schema.json` from [`skills/trevor-recorder/span.schema.draft.json`](skills/trevor-recorder/span.schema.draft.json).
 
@@ -167,7 +167,7 @@ Hour 0: copy this whole section into the product repo as `contracts/http.md` (al
 |---|---|---|
 | `POST /v1/traces` | `X-Tenant-Key` only. Key → `tenant-a` or `tenant-b` via Secrets Manager. | Trevor provisions. Alexis validates and maps key → `tenant_id`. |
 | `GET /v1/traces*` | `Authorization: Bearer <Cognito access token>` | Trevor: pool, app client, hosted UI domain, callback = CloudFront URL, `custom:tenant_id`. Alexis: JWT `custom:tenant_id` must match stored tenant. Mismatch → **403** (not 404). |
-| `GET /health` | none | Trevor: API Gateway mock. No Lambda. |
+| `GET /health` | none | Trevor: **no Lambda**. HTTP API (API Gateway v2) has no `MOCK` integration type, so `/health` is an `HTTP_PROXY` route to a static `health.json` on the CloudFront origin. Body stays `{"ok":true}`. |
 
 Ingest is **not** Cognito. Users `tenant-a` and `tenant-b` have `custom:tenant_id` = username. Passwords via `TF_VAR_*`, not git. No force-change-on-first-login (judges sign in once).
 
@@ -183,7 +183,7 @@ Ingest is **not** Cognito. Users `tenant-a` and `tenant-b` have `custom:tenant_i
 
 | Method | Path | Auth | Code | AWS | Success |
 |---|---|---|---|---|---|
-| `GET` | `/health` | none | — | Trevor mock | `200 {"ok":true}` |
+| `GET` | `/health` | none | — | Trevor `HTTP_PROXY` → `health.json` (no Lambda) | `200 {"ok":true}` |
 | `POST` | `/v1/traces` | tenant key | Alexis ingest→redact→store | `vault-ingest` | `202 {"accepted":true,"trace_id":"<id>"}` |
 | `GET` | `/v1/traces?limit=50` | JWT | Alexis read | `vault-read` | `200 {"flights":[...]}` |
 | `GET` | `/v1/traces/{trace_id}` | JWT | Alexis read | `vault-read` | `200 {"trace_id","tenant_id","expires_at","spans":[...]}` |
@@ -359,17 +359,19 @@ Red-team **show one attack** (handbook): SSN in prompt → stored JSON has no SS
 
 ### Submission pack (D2 PM — do not skip)
 
-Handbook §6. Owners copy into the **product** repo README:
+Handbook §6. **Scoring text stays in this scratchbook** (`PLAN.md` + `JUDGE.md`). Do not paste the handbook into the product repo.
 
-1–3, 20: name, theme, pitch, problem, roster — **PLAN** (this file)  
+Product repo (thin only): name, theme, public URL, pointer to this scratchbook, `AI_USAGE.md`.
+
+1–3, 20: name, theme, pitch, problem, roster — **this file**  
 4: architecture — mermaid above  
-5–6: URL + product GitHub — Trevor  
-7–8: tech + `AI_USAGE.md` — all three  
+5–6: URL + product GitHub — Trevor (URL on the product README)  
+7–8: tech inventory here; `AI_USAGE.md` in the **product** repo  
 9–10: this threat model + Alexis/Trevor/Michael tests  
 11: system card above  
 12–16: GHA green, gitleaks, trivy/sbom artifact  
 17: Makefile help = runbook  
-18: judge path live  
+18: judge path live (`JUDGE.md`)  
 19: limitations = Do-not-build list  
 
 ### Cycle (handbook §2) — do not skip a gate
@@ -461,7 +463,7 @@ Trevor’s agent ids (his folder only): `trevor-sdk`, `trevor-demo`, `trevor-scr
 contracts/span.schema.json
 contracts/http.md
 contracts/fixtures/tenant-a-rag.json    # full flight, not one span
-contracts/fixtures/tenant-b-pii.json
+contracts/fixtures/tenant-b-forbidden.json   # full flight + the 403 example
 sdk/                 # Trevor
 demo-app/            # Trevor
 vault/{ingest,redact,store,read,audit,handlers}/   # Alexis
