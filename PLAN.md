@@ -166,8 +166,10 @@ Hour 0: copy this whole section into the product repo as `contracts/http.md` (al
 | Surface | Auth | Who |
 |---|---|---|
 | `POST /v1/traces` | `X-Tenant-Key` only. Key → `tenant-a` or `tenant-b` via Secrets Manager. | Trevor provisions. Alexis validates and maps key → `tenant_id`. |
-| `GET /v1/traces*` | `Authorization: Bearer <Cognito access token>` | Trevor: pool, app client, hosted UI domain, callback = CloudFront URL, `custom:tenant_id`. Alexis: JWT `custom:tenant_id` must match stored tenant. Mismatch → **403** (not 404). |
+| `GET /v1/traces*` | `Authorization: Bearer <Cognito **ID** token>` | Trevor: pool, app client, hosted UI domain, callback = CloudFront URL, `custom:tenant_id`. Alexis: JWT `custom:tenant_id` must match stored tenant. Mismatch → **403** (not 404). |
 | `GET /health` | none | Trevor: **no Lambda**. HTTP API (API Gateway v2) has no `MOCK` integration type, so `/health` is an `HTTP_PROXY` route to a static `health.json` on the CloudFront origin. Body stays `{"ok":true}`. |
+
+**ID token, not access token.** Cognito puts custom attributes on the **ID** token only — an access token carries `sub`, `client_id`, `scope`, `username`, never `custom:tenant_id`. The JWT authorizer accepts either, so the gateway will not catch the mistake; it reaches `vault-read` with no tenant claim. Fail closed there (`401`), never open.
 
 Ingest is **not** Cognito. Users `tenant-a` and `tenant-b` have `custom:tenant_id` = username. Passwords via `TF_VAR_*`, not git. No force-change-on-first-login (judges sign in once).
 
@@ -216,6 +218,8 @@ NEXT_PUBLIC_COGNITO_DOMAIN
 ```
 
 Tokens in memory or sessionStorage. Trevor outputs these values. Michael does not hardcode URLs.
+
+`TRACEVAULT_INGEST_URL` is the API **base** URL — the SDK appends `/v1/traces`. Terraform's `ingest_url` output is the full endpoint and must not be wired into it; use `api_url`.
 
 ---
 
