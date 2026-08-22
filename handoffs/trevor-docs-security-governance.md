@@ -49,12 +49,3 @@ nobody
 ## Contract reminder
 
 SOC2/CloudTrail/GuardDuty still out. Redaction + 403 + KMS + OIDC + WAF + HTTPS-only are in.
-
-## Pickup prompt (paste into the other LLM)
-
-```
-Read PLAN.md Security + governance.
-Do not edit those claimed paths unless you are this PR.
-Alexis: enterprise.md redaction/403/audit. Michael: no PII on screen. Trevor-infra: KMS, OIDC, WAF, HTTPS-only.
-Do not merge to main — Trevor merges.
-```

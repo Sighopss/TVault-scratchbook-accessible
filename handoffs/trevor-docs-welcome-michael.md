@@ -49,12 +49,3 @@ nobody
 ## Contract reminder
 
 Not a campaign site. Kill welcome before redaction/403 if time slips. Alexis does not design this.
-
-## Pickup prompt (paste into the other LLM)
-
-```
-Read this handoff and PLAN.md Michael section.
-Do not edit PLAN.md unless you are this docs PR.
-If you are Michael: welcome is yours. Fill your constitution, then shape `/`.
-Do not merge to main — Trevor merges.
-```

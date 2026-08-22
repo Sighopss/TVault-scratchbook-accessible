@@ -69,13 +69,3 @@ nobody
 ## Contract reminder
 
 Scratchpad process only. No second product. Grafana is not the UI.
-
-## Pickup prompt (paste into the other LLM)
-
-```
-Read this handoff and PLAN.md Handbook Cycle + Rubric 100.
-Do not edit the claimed paths above.
-Fill your constitution with your P-ids and tests from the Handbook.
-Every later PR: Handbook evidence on the handoff.
-Do not merge to main — Trevor merges.
-```
