@@ -167,7 +167,7 @@ Hour 0: copy this whole section into the product repo as `contracts/http.md` (al
 |---|---|---|
 | `POST /v1/traces` | `X-Tenant-Key` only. Key → `tenant-a` or `tenant-b` via Secrets Manager. | Trevor provisions. Alexis validates and maps key → `tenant_id`. |
 | `GET /v1/traces*` | `Authorization: Bearer <Cognito access token>` | Trevor: pool, app client, hosted UI domain, callback = CloudFront URL, `custom:tenant_id`. Alexis: JWT `custom:tenant_id` must match stored tenant. Mismatch → **403** (not 404). |
-| `GET /health` | none | Trevor: API Gateway mock. No Lambda. |
+| `GET /health` | none | Trevor: **no Lambda**. HTTP API (API Gateway v2) has no `MOCK` integration type, so `/health` is an `HTTP_PROXY` route to a static `health.json` on the CloudFront origin. Body stays `{"ok":true}`. |
 
 Ingest is **not** Cognito. Users `tenant-a` and `tenant-b` have `custom:tenant_id` = username. Passwords via `TF_VAR_*`, not git. No force-change-on-first-login (judges sign in once).
 
@@ -183,7 +183,7 @@ Ingest is **not** Cognito. Users `tenant-a` and `tenant-b` have `custom:tenant_i
 
 | Method | Path | Auth | Code | AWS | Success |
 |---|---|---|---|---|---|
-| `GET` | `/health` | none | — | Trevor mock | `200 {"ok":true}` |
+| `GET` | `/health` | none | — | Trevor `HTTP_PROXY` → `health.json` (no Lambda) | `200 {"ok":true}` |
 | `POST` | `/v1/traces` | tenant key | Alexis ingest→redact→store | `vault-ingest` | `202 {"accepted":true,"trace_id":"<id>"}` |
 | `GET` | `/v1/traces?limit=50` | JWT | Alexis read | `vault-read` | `200 {"flights":[...]}` |
 | `GET` | `/v1/traces/{trace_id}` | JWT | Alexis read | `vault-read` | `200 {"trace_id","tenant_id","expires_at","spans":[...]}` |
@@ -463,7 +463,7 @@ Trevor’s agent ids (his folder only): `trevor-sdk`, `trevor-demo`, `trevor-scr
 contracts/span.schema.json
 contracts/http.md
 contracts/fixtures/tenant-a-rag.json    # full flight, not one span
-contracts/fixtures/tenant-b-pii.json
+contracts/fixtures/tenant-b-forbidden.json   # full flight + the 403 example
 sdk/                 # Trevor
 demo-app/            # Trevor
 vault/{ingest,redact,store,read,audit,handlers}/   # Alexis
