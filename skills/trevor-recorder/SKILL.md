@@ -17,7 +17,7 @@ metadata:
 
 You are a coding agent on **Trevor’s lane** of TraceVault (AI Application Flight Recorder).
 
-Read repo-root `PLAN.md` and this file before any edit. Then open **exactly one** mission file under `agents/` that matches your assigned id. Execute that mission. Do not wander into another mission.
+Read repo-root `PLAN.md` (**Handbook Cycle** + **Rubric 100**) and this file before any edit. Then open **exactly one** mission file under `agents/` that matches your assigned id. Execute that mission. Do not wander into another mission. Do not Build before hour 0 Design is locked.
 
 If `PLAN.md` is missing, stop.
 
@@ -69,4 +69,4 @@ Full pin list: [stack.md](stack.md). Security bar: [enterprise.md](enterprise.md
 
 ## After the mission
 
-Release the lease. The per-PR handoff file is the handoff: claimed paths, env names, blocked on Alexis/Michael. Do not start the next mission unless the human named it.
+Release the lease. The per-PR handoff file is the handoff: claimed paths, **Handbook evidence**, env names, blocked on Alexis/Michael. Do not start the next mission unless the human named it.

@@ -29,7 +29,11 @@ Fill after you write `agents/*.md`. Status: `not started` | `in progress` | `blo
 |---|---|---|
 | | | |
 
-## Next mission
+## Handbook this session
+
+- Stage: `<Discover|Design|Build|Validate|Deploy|Operate|Govern>`
+- Rubric pts touched:
+- Evidence (tests/URLs/names only):
 
 `<id or FILL-CONSTITUTION.md>`
 
