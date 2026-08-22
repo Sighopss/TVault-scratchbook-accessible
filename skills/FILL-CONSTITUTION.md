@@ -36,7 +36,7 @@ Copy **every file** from `skills/lane-constitution/` to `skills/<your-lane>/`. K
 
 | Read | You take |
 |---|---|
-| `PLAN.md` Done-bar, Judge path, Winners steal | constraints, kill-order, what judges click |
+| `PLAN.md` Done-bar, Judge path, Winners steal + `JUDGE.md` | constraints, kill-order, what judges click. Do not copy PLAN/JUDGE into the product repo. |
 | `PLAN.md` **your named section** (Alexis or Michael) | write paths, numbered work, tests you owe |
 | `PLAN.md` HTTP + auth | routes, error JSON, two Lambdas vs Explorer env — **only the rows you implement** |
 | `PLAN.md` **Security + governance** | your rows only (Alexis: redaction/403/audit; Michael: no PII on screen) |
@@ -104,7 +104,7 @@ Do not implement application code in the same first pass unless the human said t
 
 Every session:
 
-1. `START.md` → `PLAN.md` (**Handbook Cycle** — which stage?) → `handoffs/README.md` → `gh pr list --state open` (stop if claimed paths overlap) → your `SKILL.md` → one mission (or this fill file if still incomplete). Do not Build if Design (hour 0) is unlocked.
+1. `START.md` → scratchbook `PLAN.md` (**Handbook Cycle** — which stage?) + `JUDGE.md` → `handoffs/README.md` → `gh pr list --state open` (stop if claimed paths overlap) → your `SKILL.md` → one mission (or this fill file if still incomplete). Do not Build if Design (hour 0) is unlocked. Do not write PLAN/JUDGE into the product repo.
 2. Do the work.
 3. **Write back** into the constitution: tick workflow, append `progress.md` (include lifecycle stage + rubric rows), add learned env/paths to `stack.md`.
 4. Commit `handoffs/<your-name>-<id>-<slug>.md` on the PR (copy `handoffs/PR.example.md`). Fill **Handbook evidence**. Paste it in the PR body.

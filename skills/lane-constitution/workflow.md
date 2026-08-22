@@ -6,7 +6,7 @@ If `SKILL.md` still has `<placeholders>` or you have no real `agents/<id>.md` ye
 
 After it is filled:
 
-1. Read `PLAN.md` — **Handbook Cycle** (which stage?) + your named tasks. Do not Build if Design gate is open.
+1. Read scratchbook `PLAN.md` — **Handbook Cycle** (which stage?) + your named tasks — and `JUDGE.md`. Do not Build if Design gate is open. Do not copy PLAN/JUDGE into the product repo. Do not break Never-kill.
 2. Read `skills/<your-lane>/SKILL.md`.
 3. Read **one** `agents/*.md` matching your id.
 4. Collision: local lease **and** open PRs (`handoffs/README.md`). Stop on overlap.

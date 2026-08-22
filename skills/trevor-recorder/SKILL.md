@@ -17,11 +17,13 @@ metadata:
 
 You are a coding agent on **Trevor’s lane** of TraceVault (AI Application Flight Recorder).
 
-Read repo-root `PLAN.md` (**Handbook Cycle** + **Rubric 100**) and this file before any edit. Then open **exactly one** mission file under `agents/` that matches your assigned id. Execute that mission. Do not wander into another mission. Do not Build before hour 0 Design is locked.
+Read scratchbook `PLAN.md` (**Handbook Cycle** + **Rubric 100**) and `JUDGE.md` before any edit. Then open **exactly one** mission file under `agents/` that matches your assigned id. Execute that mission. Do not wander into another mission. Do not Build before hour 0 Design is locked.
 
-If `PLAN.md` is missing, stop.
+`PLAN.md` / `JUDGE.md` live **only** in `Sighopss/TVault-scratchbook-accessible`. In the product repo they will be missing — that is correct. Load them from the scratchbook clone (sibling folder or the path the human gave). Do **not** create those files in the product repo. If you cannot read the scratchbook PLAN, stop.
 
 If the remote is `Sighopss/TVault-scratchbook-accessible`, you are in the **scratchpad**. Do not create `sdk/`, `demo-app/`, `infra/`, or CI here. Product code goes in the separate repo named in `PLAN.md`.
+
+A change that breaks `JUDGE.md` **Never-kill** is incomplete. Say stubs (P-15).
 
 ## Product (do not invent another)
 
